@@ -8,6 +8,4 @@ module uk.aber.ac.keg21.musicapp {
 
     opens uk.aber.ac.keg21.musicapp to javafx.fxml;
     exports uk.aber.ac.keg21.musicapp;
-    exports uk.aber.ac.keg21.musicapp.UI;
-    opens uk.aber.ac.keg21.musicapp.UI to javafx.fxml;
 }

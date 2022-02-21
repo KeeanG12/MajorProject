@@ -1,0 +1,46 @@
+.control-bar-colour{
+    -fx-background-color:#eaeaea;
+}
+
+.main-background-colour{
+    -fx-background-color: linear-gradient(to right, #43cea2 , #185a9d);
+}
+
+.menu-bar{
+    -fx-background-color: #eaeaea;
+    -fx-background-radius: 0 30 30 0;
+}
+
+.play-button{
+    -fx-graphic: url(Icons/Play.png);
+    -fx-content-display: graphic-only;
+}
+
+.next-button{
+    -fx-graphic: url(Icons/FastForward.png);
+    -fx-content-display: graphic-only;
+}
+
+.previous-button{
+    -fx-graphic: url(Icons/Rewind.png);
+    -fx-content-display: graphic-only;
+}
+
+.settings-button{
+    -fx-graphic: url(Icons/Settings.png);
+    -fx-content-display: left;
+}
+
+.songs-button{
+    -fx-graphic: url(Icons/Song.png);
+    -fx-content-display: left;
+}
+
+.playlist-button{
+    -fx-graphic: url(Icons/Album.png);
+    -fx-content-display: left;
+}
+
+.table{
+    -fx-background-color:rgba(0,0,0,0) ;
+}
