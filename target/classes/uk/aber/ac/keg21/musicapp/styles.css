@@ -29,16 +29,19 @@
 .settings-button{
     -fx-graphic: url(Icons/Settings.png);
     -fx-content-display: left;
+    -fx-background-color: rgba(0,0,0,0);
 }
 
 .songs-button{
     -fx-graphic: url(Icons/Song.png);
     -fx-content-display: left;
+    -fx-background-color: rgba(0,0,0,0);
 }
 
 .playlist-button{
     -fx-graphic: url(Icons/Album.png);
     -fx-content-display: left;
+    -fx-background-color: rgba(0,0,0,0);
 }
 
 .table{

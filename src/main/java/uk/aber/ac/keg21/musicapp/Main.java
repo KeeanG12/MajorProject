@@ -5,6 +5,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.IOException;
+
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
@@ -15,10 +18,15 @@ public class Main extends Application {
         stage.show();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         //launch();
         
         Database music = Database.getInstance();
+//        music.startUp();
+        music.scanAndPopulate(new File("D:/UniWork/Third Year/Major Project/MajorProject/src/main/resources/uk/aber/ac/keg21/musicapp/Tunes"));
+        music.toString();
+//        
+//        music.delete();
         
     }
 }
