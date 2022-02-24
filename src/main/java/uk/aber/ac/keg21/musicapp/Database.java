@@ -14,9 +14,7 @@ import org.jaudiotagger.tag.id3.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.sql.*;
-import java.util.Objects;
 
 public class Database {
 
@@ -165,6 +163,52 @@ public class Database {
         }
     }
     
+    private boolean checkExists(String name, String table, String idType) {
+        
+        String sql = "SELECT '"+idType+"', name FROM '"+table+"' WHERE name = '"+name+"'";
+        
+        
+        
+        boolean exists = false;
+        
+        
+        try(Connection conn = this.connect();
+            Statement statement = conn.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                exists = true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return exists;
+    }
+    
+    int dbID = 1;
+    
+    
+    
+    private int getID(String name, String table, String idType) {
+        String sql = "SELECT * from '"+table+"' WHERE name = '"+name+"'";
+
+        
+        
+
+
+        try(Connection conn = this.connect();
+            Statement statement = conn.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql)) {
+            dbID = resultSet.getInt( idType);
+            while (resultSet.next()) {
+                dbID = resultSet.getInt( idType);
+                System.out.println(resultSet.getInt(idType));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return dbID;
+    }
+    
     
     //Scan Directory
     //Check if 
@@ -219,43 +263,65 @@ public class Database {
                 } catch (InvalidAudioFrameException e) {
                     e.printStackTrace();
                 }
+                
                 Tag tag = f.getTag();
                 MP3AudioHeader audioHeader = f.getMP3AudioHeader();
                 AbstractID3v2Tag v2tag  = f.getID3v2Tag();
                 
                 System.out.println(audioHeader.getTrackLengthAsString());
-                String artist = v2tag.getFirst(ID3v24Frames.FRAME_ID_ARTIST);
-                String parts[] = artist.split("Feat.");
+                String artistTag = v2tag.getFirst(ID3v24Frames.FRAME_ID_ARTIST);
+                String parts[] = artistTag.split(" Feat. ");
                 
-                if(Objects.equals(previousArtist, parts[0]) && previousID != id) {
-                    
-                } else if(previousArtist != parts[0] && previousID != id) {
-
-                    insertArtist(id, parts[0]);
-                    
+                String artist = parts[0];
+                artist.replace(',', ' ');
+                String album = v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM);
+                String song = v2tag.getFirst(ID3v24Frames.FRAME_ID_TITLE);
+                
+                
+                if(checkExists(artist, "artist", "artistID") && artistID != previousID) {
+                    artistID = getID(artist, "artist", "artistID");
+                    System.out.println(artistID);
+                } else {
+                    insertArtist(artistID, artist);
                 }
                 
-                if(Objects.equals(previousAlbum, v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM)) && previousID != id) {
-                    
-                } else if(previousAlbum != v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM) && previousID != id) {
-                    insertAlbum(id, id, v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM), Integer.parseInt(v2tag.getFirst(FieldKey.YEAR)));
+                if(checkExists(album, "album", "albumID")) {
+                    albumID = getID(album, "album", "albumID");
+                    System.out.println(albumID);
+                } else {
+                    insertAlbum(artistID, albumID, album, Integer.parseInt(v2tag.getFirst(FieldKey.YEAR)));
                 }
                 
-                if(Objects.equals(previousAlbum, v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM))) {
-                    id--;
-                    insertSong(id, songID , v2tag.getFirst(ID3v24Frames.FRAME_ID_TITLE), id, String.valueOf(audioHeader.getTrackLength()));
-                } else if(!Objects.equals(previousAlbum, v2tag.getFirst(ID3v24Frames.FRAME_ID_TITLE))) {
-                    insertSong(id, songID, v2tag.getFirst(ID3v24Frames.FRAME_ID_TITLE), id, String.valueOf(audioHeader.getTrackLength()));
-                }
+                insertSong(albumID, songID, song, artistID, String.valueOf(audioHeader.getTrackLength()));
+                
+                
+//                
                 
                 numFiles++;
-                id++;
-                previousID = id -1;
+                previousID = albumID;
+                albumID++;
+                artistID++;
                 songID++;
-                previousArtist = parts[0];
-                previousAlbum = v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM);
-                previousSong = v2tag.getFirst(ID3v24Frames.FRAME_ID_TITLE);
-            } else {
+//                if(Objects.equals(previousArtist, parts[0]) && previousID != id) {
+////                    
+//                } else if(previousArtist != parts[0]){
+//                    insertArtist(id, parts[0]);
+//                }
+//                
+//                if(Objects.equals(previousAlbum, v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM)) && previousID != id) {
+//
+//                } else if(previousAlbum != v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM)) {
+//                    insertAlbum(id, id, v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM), Integer.parseInt(v2tag.getFirst(FieldKey.YEAR)));
+//                }
+//
+//                if(Objects.equals(previousAlbum, v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM)) && previousID !=id) {
+//                    id--;
+//                    insertSong(id, songID , v2tag.getFirst(ID3v24Frames.FRAME_ID_TITLE), id, String.valueOf(audioHeader.getTrackLength()));
+//                } else if(!Objects.equals(previousAlbum, v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM))) {
+//                    insertSong(id, songID, v2tag.getFirst(ID3v24Frames.FRAME_ID_TITLE), id, String.valueOf(audioHeader.getTrackLength()));
+//                }           id++;
+                
+                } else {
                 numDirectories++;
                 File[] files = file.listFiles();
                 for (File otherFile : files) {
