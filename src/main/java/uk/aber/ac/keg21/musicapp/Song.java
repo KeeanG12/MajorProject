@@ -4,11 +4,17 @@ public class Song {
     private int songID;
     private String name;
     private int albumID;
+    private int artistID;
+    private String duration;
+    
 
-    public Song(int songID, String name, int albumID) {
+    public Song(int songID, String name, int albumID, int artistID, String duration) {
         this.songID = songID;
         this.name = name;
         this.albumID = albumID;
+        this.artistID = artistID;
+        this.duration = duration;
+        
     }
 
     public int getSongID() {
@@ -33,5 +39,21 @@ public class Song {
 
     public void setAlbumID(int albumID) {
         this.albumID = albumID;
+    }
+
+    public int getArtistID() {
+        return artistID;
+    }
+
+    public void setArtistID(int artistID) {
+        this.artistID = artistID;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
 }

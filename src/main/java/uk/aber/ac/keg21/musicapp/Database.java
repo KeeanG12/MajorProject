@@ -20,11 +20,11 @@ public class Database {
 
     String artist = "Create table if not exists artist(artistID integer primary key NOT NULL, name string NOT NULL)";
 
-    String album = "Create table if not exists album(albumID integer primary key NOT NULL, name string NOT NULL, produced DATE, artist integer, foreign key (artist) REFERENCES artist (artistID));";
+    String album = "Create table if not exists album(albumID integer primary key NOT NULL, name string NOT NULL, produced DATE, artistID integer, foreign key (artistID) REFERENCES artist (artistID));";
 
-    String song = "Create table if not exists songs(songID integer primary key NOT NULL, name string NOT NULL, album Integer,artist INTEGER, duration string, Foreign key (album) references album (albumID), FOREIGN KEY (artist) references artist (artistID))";
+    String song = "Create table if not exists songs(songID integer primary key NOT NULL, name string NOT NULL, albumID Integer,artistID INTEGER, duration string, Foreign key (albumID) references album (albumID), FOREIGN KEY (artistID) references artist (artistID))";
 
-    String drop = "DROP TABLE songs";
+    String drop = "DROP TABLE song";
     
     private static Database music = null;
 
@@ -88,7 +88,7 @@ public class Database {
 
     public void insertAlbum (int artistID, int albumID, String albumName, int produced) {
 
-        String album = "INSERT INTO album(albumID, name, produced, artist) VALUES(?,?,?,?)";
+        String album = "INSERT INTO album(albumID, name, produced, artistID) VALUES(?,?,?,?)";
         String sql = "DELETE FROM album";
 
         try (Connection conn = this.connect();
@@ -107,7 +107,7 @@ public class Database {
                 System.out.println("AlbumID = " + rs.getInt("albumID"));
                 System.out.println("Name = " + rs.getString("name"));
                 System.out.println("Produced = " + rs.getInt("produced"));
-                System.out.println("ArtistID = " + rs.getInt("artist"));
+                System.out.println("ArtistID = " + rs.getInt("artistID"));
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -116,7 +116,7 @@ public class Database {
 
     public void insertSong(int albumID, int songID, String songName, int artistID, String duration) {
 
-        String song = "INSERT INTO songs(songID, name, album, artist, duration) VALUES(?,?,?,?,?)";
+        String song = "INSERT INTO songs(songID, name, albumID, artistID, duration) VALUES(?,?,?,?,?)";
         String sql = "DELETE FROM songs";
 
         try (Connection conn = this.connect();
@@ -135,9 +135,9 @@ public class Database {
                 // read the result set
                 System.out.println("SongID = " + rs.getInt("songID"));
                 System.out.println("Name = " + rs.getString("name"));
-                System.out.println("AlbumID = " + rs.getInt("album"));
-                System.out.println("ArtistID = " + rs.getInt("artist"));
-                System.out.println("Duration = " + rs.getInt("duration"));
+                System.out.println("AlbumID = " + rs.getInt("albumID"));
+                System.out.println("ArtistID = " + rs.getInt("artistID"));
+                System.out.println("Duration = " + rs.getString("duration"));
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -236,7 +236,7 @@ public class Database {
     }
 
     /**
-     * Scans file recursivley and populates SQLite DB will each files tag data
+     * Scans file recursivley and populates SQLite DB with each files tag data
      * @param file
      * @throws CannotReadException
      * @throws TagException
@@ -244,12 +244,14 @@ public class Database {
      * @throws ReadOnlyFileException
      * @throws IOException
      */
-    public void scanAndPopulate(File file) throws IOException {
+    public void rescan(File file) throws IOException {
         
+            //Checks if the file is a directory or a file
             if (file.isFile()) {
-//                System.out.println(Files.probeContentType(file.toPath()));
+                //Initialising variables in order to get tag data
                 AudioFile audioFile = null;
                 MP3File f = null;
+                //Setting the MP3 file to AudioFile.read of the current file being parsed in
                 try {
                     f = (MP3File) AudioFileIO.read(new File(file.getAbsolutePath()));
                 } catch (CannotReadException e) {
@@ -264,68 +266,54 @@ public class Database {
                     e.printStackTrace();
                 }
                 
+                //Creating a tag variable to get the tag data of the MP3 AudioFile
                 Tag tag = f.getTag();
                 MP3AudioHeader audioHeader = f.getMP3AudioHeader();
                 AbstractID3v2Tag v2tag  = f.getID3v2Tag();
                 
+                
+                //Retrieving everything before " Feat." in the artist name using .split
                 System.out.println(audioHeader.getTrackLengthAsString());
                 String artistTag = v2tag.getFirst(ID3v24Frames.FRAME_ID_ARTIST);
                 String parts[] = artistTag.split(" Feat. ");
                 
+                //Declaring current artist, album and song
                 String artist = parts[0];
-                artist.replace(',', ' ');
                 String album = v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM);
                 String song = v2tag.getFirst(ID3v24Frames.FRAME_ID_TITLE);
                 
                 
+                //Checks if current artist already exists in database and gets the ID if true
                 if(checkExists(artist, "artist", "artistID") && artistID != previousID) {
                     artistID = getID(artist, "artist", "artistID");
                     System.out.println(artistID);
+                //Adds the current artist if they don't exist in the database    
                 } else {
                     insertArtist(artistID, artist);
                 }
-                
+                //Checks if current album already exists in database and gets the ID if true
                 if(checkExists(album, "album", "albumID")) {
                     albumID = getID(album, "album", "albumID");
                     System.out.println(albumID);
+                //Adds current album if it doesn't exist in the database    
                 } else {
                     insertAlbum(artistID, albumID, album, Integer.parseInt(v2tag.getFirst(FieldKey.YEAR)));
                 }
                 
-                insertSong(albumID, songID, song, artistID, String.valueOf(audioHeader.getTrackLength()));
-                
-                
-//                
+                insertSong(albumID, songID, song, artistID, (audioHeader.getTrackLengthAsString()));
                 
                 numFiles++;
                 previousID = albumID;
                 albumID++;
                 artistID++;
                 songID++;
-//                if(Objects.equals(previousArtist, parts[0]) && previousID != id) {
-////                    
-//                } else if(previousArtist != parts[0]){
-//                    insertArtist(id, parts[0]);
-//                }
-//                
-//                if(Objects.equals(previousAlbum, v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM)) && previousID != id) {
-//
-//                } else if(previousAlbum != v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM)) {
-//                    insertAlbum(id, id, v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM), Integer.parseInt(v2tag.getFirst(FieldKey.YEAR)));
-//                }
-//
-//                if(Objects.equals(previousAlbum, v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM)) && previousID !=id) {
-//                    id--;
-//                    insertSong(id, songID , v2tag.getFirst(ID3v24Frames.FRAME_ID_TITLE), id, String.valueOf(audioHeader.getTrackLength()));
-//                } else if(!Objects.equals(previousAlbum, v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM))) {
-//                    insertSong(id, songID, v2tag.getFirst(ID3v24Frames.FRAME_ID_TITLE), id, String.valueOf(audioHeader.getTrackLength()));
-//                }           id++;
+                
                 
                 } else {
                 numDirectories++;
                 File[] files = file.listFiles();
                 for (File otherFile : files) {
-                    scanAndPopulate(otherFile);
+                    rescan(otherFile);
                 }
             }
         }

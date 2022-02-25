@@ -78,13 +78,13 @@
             </ImageView>
          </top>
          <center>
-            <TableView prefHeight="573.0" prefWidth="791.0" styleClass="table" stylesheets="@styles.css" BorderPane.alignment="CENTER">
+            <TableView fx:id="tableView" prefHeight="573.0" prefWidth="791.0" styleClass="table" stylesheets="@styles.css" BorderPane.alignment="CENTER">
               <columns>
-                <TableColumn prefWidth="208.0" text="Song" />
-                <TableColumn prefWidth="228.0" text="Artist" />
-                  <TableColumn prefWidth="219.0" text="Album" />
-                  <TableColumn prefWidth="68.0" text="Produced" />
-                  <TableColumn prefWidth="68.0" text="Duration" />
+                <TableColumn fx:id="colTitle" prefWidth="208.0" text="Title" />
+                <TableColumn fx:id="colArtist" prefWidth="228.0" text="Artist" />
+                  <TableColumn fx:id="colAlbum" prefWidth="177.0" text="Album" />
+                  <TableColumn fx:id="colProduced" prefWidth="97.0" text="Produced" />
+                  <TableColumn fx:id="colDuration" prefWidth="81.0" text="Duration" />
               </columns>
             </TableView>
          </center>

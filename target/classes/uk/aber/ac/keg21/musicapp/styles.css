@@ -14,16 +14,20 @@
 .play-button{
     -fx-graphic: url(Icons/Play.png);
     -fx-content-display: graphic-only;
+    -fx-background-color: rgba(0,0,0,0);
 }
 
 .next-button{
     -fx-graphic: url(Icons/FastForward.png);
     -fx-content-display: graphic-only;
+    -fx-background-color: rgba(0,0,0,0);
 }
 
 .previous-button{
     -fx-graphic: url(Icons/Rewind.png);
     -fx-content-display: graphic-only;
+    -fx-background-color: rgba(0,0,0,0);
+    
 }
 
 .settings-button{
