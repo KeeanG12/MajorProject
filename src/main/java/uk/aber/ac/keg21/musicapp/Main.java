@@ -23,11 +23,11 @@ public class Main extends Application {
 
     
     public static void main(String[] args) throws IOException {
-        //launch();
+        launch();
         
         Database music = Database.getInstance();
 //        music.startUp();
-        music.rescan(new File("D:/UniWork/Third Year/Major Project/MajorProject/src/main/resources/uk/aber/ac/keg21/musicapp/Tunes"));
+//        music.rescan(new File("D:/UniWork/Third Year/Major Project/MajorProject/src/main/resources/uk/aber/ac/keg21/musicapp/Tunes"));
 //
 //        music.delete();
         

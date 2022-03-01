@@ -48,6 +48,6 @@
     -fx-background-color: rgba(0,0,0,0);
 }
 
-.table{
-    -fx-background-color:rgba(0,0,0,0) ;
+.table-view{
+    -fx-background-color: linear-gradient(to right, #43cea2 , #185a9d) ;
 }

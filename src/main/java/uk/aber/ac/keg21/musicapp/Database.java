@@ -164,13 +164,9 @@ public class Database {
     }
     
     private boolean checkExists(String name, String table, String idType) {
-        
         String sql = "SELECT '"+idType+"', name FROM '"+table+"' WHERE name = '"+name+"'";
         
-        
-        
         boolean exists = false;
-        
         
         try(Connection conn = this.connect();
             Statement statement = conn.createStatement();
@@ -191,10 +187,6 @@ public class Database {
     private int getID(String name, String table, String idType) {
         String sql = "SELECT * from '"+table+"' WHERE name = '"+name+"'";
 
-        
-        
-
-
         try(Connection conn = this.connect();
             Statement statement = conn.createStatement();
             ResultSet resultSet = statement.executeQuery(sql)) {
@@ -209,31 +201,15 @@ public class Database {
         return dbID;
     }
     
-    
-    //Scan Directory
-    //Check if 
 
     //Variables for Number of files, Number of directories and track number
     private int numFiles;
     private int numDirectories;
-
-    int id = 1;
-    String previousArtist;
-    String previousAlbum;
-    String previousSong;
+    
     int previousID = 0;
     int artistID = 1;
-    int albumID = 1;
-    int songID = 1;
-    
-
-    @Override
-    public String toString() {
-        return "Database{" +
-                "numFiles=" + numFiles +
-                ", numDirectories=" + numDirectories +
-                '}';
-    }
+    int albumID = 100;
+    int songID = 1000;
 
     /**
      * Scans file recursivley and populates SQLite DB with each files tag data
@@ -273,7 +249,6 @@ public class Database {
                 
                 
                 //Retrieving everything before " Feat." in the artist name using .split
-                System.out.println(audioHeader.getTrackLengthAsString());
                 String artistTag = v2tag.getFirst(ID3v24Frames.FRAME_ID_ARTIST);
                 String parts[] = artistTag.split(" Feat. ");
                 
@@ -299,9 +274,10 @@ public class Database {
                 } else {
                     insertAlbum(artistID, albumID, album, Integer.parseInt(v2tag.getFirst(FieldKey.YEAR)));
                 }
-                
+                //Adds current song
                 insertSong(albumID, songID, song, artistID, (audioHeader.getTrackLengthAsString()));
                 
+                //Adding 1 to each ID
                 numFiles++;
                 previousID = albumID;
                 albumID++;
@@ -311,13 +287,18 @@ public class Database {
                 
                 } else {
                 numDirectories++;
+                //List the files in the directory
                 File[] files = file.listFiles();
+                
+                //For each file call rescan on that file
                 for (File otherFile : files) {
                     rescan(otherFile);
                 }
             }
         }
-
+        
+        
+        //Used to getInstance of Database class as it is a singleton
     public static Database getInstance() {
         if (music == null)
             music = new Database();

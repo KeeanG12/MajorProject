@@ -1,25 +1,146 @@
 package uk.aber.ac.keg21.musicapp;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 
-public class MainController {
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.sql.*;
+import java.util.ResourceBundle;
 
+public class MainController implements Initializable {
+
+    @FXML
     public TableView tableView;
     
+    @FXML
+    public TableColumn colSongID;
+    
+    @FXML
     public TableColumn colTitle;
-    public TableColumn colArtist;
-    public TableColumn colAlbum;
-    public TableColumn colProduced;
+    
+    @FXML
+    public TableColumn colArtistName;
+
+    @FXML
+    public TableColumn colAlbumName;
+    
+    @FXML
     public TableColumn colDuration;
 
+    @FXML
+    public MediaPlayer player;
 
-    public void onHelloButtonClick(ActionEvent actionEvent) {
+    @FXML
+    public void playButton(ActionEvent actionEvent) throws URISyntaxException {
+        //Getting the selection model to know which cell the user selects
+        TableView.TableViewSelectionModel<Song> selectionModel = tableView.getSelectionModel();
         
+        //Setting selection mode to single, so they can only select a single cell
+        selectionModel.setSelectionMode(SelectionMode.SINGLE);
+        Song selected = selectionModel.getSelectedItem();
+        
+        //Finding the directory path from the selected cell data
+        String title = selected.getName() + ".mp3";
+        String album = selected.getAlbumName();
+        String artist = selected.getArtistName();
+        String path = artist + "\\" + album + "\\" + title;
+
+        //Uses JavaFX-Media to play a MP3 file when button is clicked
+        System.out.println(path);;
+        Media sound = new Media(new File("src\\main\\resources\\Tunes\\" + path).toURI().toString());
+        player = new MediaPlayer(sound);
+        player.play();
     }
     
-    public void fillTable() {
+    //Creating the list to populate TableView
+    private ObservableList <Song> songList;
+    
+    Song songs = new Song();
+
+    private Connection connect() {
+        // SQLite connection string
+        String db = "jdbc:sqlite:music.db";
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(db);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return conn;
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        //Setting the CellValue with the Song class as a Data Model
+        songList = FXCollections.observableArrayList();
         
+        
+        colSongID.setCellValueFactory(
+                new PropertyValueFactory<Song, Integer>("songID")
+        );
+
+        colTitle.setCellValueFactory(
+                new PropertyValueFactory<Song, String>("name")
+        );
+
+        colArtistName.setCellValueFactory(
+                new PropertyValueFactory<Song, String>("artistName")
+        );
+
+        colAlbumName.setCellValueFactory(
+                new PropertyValueFactory<Song, String>("albumName")
+        );
+
+        colDuration.setCellValueFactory(
+                new PropertyValueFactory<Song, Integer>("duration")
+        );
+        
+        //Using SQLite Inner Join to Select 3 tables using albumID
+        String select = "SELECT " +
+                "songID," +
+                "songs.name AS songName," +
+                "artist.name AS artistName," +
+                "album.name AS albumName, " +
+                "songs.duration as duration " +
+                "FROM songs " +
+                "INNER JOIN album ON album.albumID = songs.albumID " +
+                "INNER JOIN artist ON artist.artistID = album.artistID";
+        
+        try(Connection conn = this.connect();
+
+            Statement statement = conn.createStatement()) {
+            ResultSet rs = statement.executeQuery(select);
+            //Adding new song to list while ResultSet has next
+            while (rs.next()) {
+                Song s = new Song();
+                s.setSongID(rs.getInt("songID"));
+                s.setName(rs.getString("songName"));
+//                s.setArtistID(rs.getInt("artistID"));
+                s.setArtistName(rs.getString("artistName"));
+//                s.setAlbumID(rs.getInt("albumID"));
+                s.setAlbumName(rs.getString("albumName"));
+                s.setDuration(rs.getString("duration"));
+                songList.add(s);
+            }
+            
+            //Adding list to Table once all songs are in list
+            tableView.setItems(songList);
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
     }
 }

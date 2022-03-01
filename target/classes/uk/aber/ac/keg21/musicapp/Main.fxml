@@ -19,13 +19,13 @@
    <children>
       <HBox alignment="CENTER_LEFT" layoutX="21.0" layoutY="668.0" prefHeight="91.0" prefWidth="1200.0" spacing="30.0" styleClass="control-bar-colour" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
-            <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onHelloButtonClick" prefHeight="35.0" prefWidth="50.0" styleClass="previous-button" stylesheets="@styles.css" text="Previous" />
-            <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="50.0" styleClass="play-button" stylesheets="@styles.css" text="Play">
+            <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="50.0" styleClass="previous-button" stylesheets="@styles.css" text="Previous" />
+            <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#playButton" prefHeight="35.0" prefWidth="50.0" styleClass="play-button" stylesheets="@styles.css" text="Play">
                <HBox.margin>
                   <Insets />
                </HBox.margin>
             </Button>
-            <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onHelloButtonClick" prefHeight="35.0" prefWidth="50.0" styleClass="next-button" stylesheets="@styles.css" text="Next" />
+            <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="50.0" styleClass="next-button" stylesheets="@styles.css" text="Next" />
             <VBox alignment="CENTER" prefHeight="91.0" prefWidth="844.0">
                <children>
                   <Label text="Now Playing: Song Name">
@@ -43,22 +43,22 @@
       </HBox>
       <BorderPane prefHeight="711.0" prefWidth="1200.0" styleClass="main-background-colour" stylesheets="@styles.css" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <left>
-            <Pane prefHeight="502.0" prefWidth="409.0" BorderPane.alignment="CENTER">
+            <Pane prefHeight="502.0" prefWidth="352.0" BorderPane.alignment="CENTER">
                <children>
                   <VBox alignment="CENTER" layoutY="21.0" prefHeight="445.0" prefWidth="177.0" spacing="20.0" styleClass="menu-bar" stylesheets="@styles.css">
                      <opaqueInsets>
                         <Insets />
                      </opaqueInsets>
                      <children>
-                        <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onHelloButtonClick" prefHeight="70.0" prefWidth="150.0" styleClass="songs-button" stylesheets="@styles.css" text="Songs">
+                        <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="70.0" prefWidth="150.0" styleClass="songs-button" stylesheets="@styles.css" text="Songs">
                            <font>
                               <Font size="18.0" />
                            </font></Button>
-                        <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onHelloButtonClick" prefHeight="76.0" prefWidth="160.0" styleClass="playlist-button" stylesheets="@styles.css" text="Playlists">
+                        <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="76.0" prefWidth="160.0" styleClass="playlist-button" stylesheets="@styles.css" text="Playlists">
                            <font>
                               <Font size="18.0" />
                            </font></Button>
-                        <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onHelloButtonClick" prefHeight="76.0" prefWidth="199.0" styleClass="settings-button" stylesheets="@styles.css" text="Settings">
+                        <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="76.0" prefWidth="199.0" styleClass="settings-button" stylesheets="@styles.css" text="Settings">
                            <font>
                               <Font size="18.0" />
                            </font></Button>
@@ -68,7 +68,7 @@
             </Pane>
          </left>
          <top>
-            <ImageView fitHeight="209.0" fitWidth="356.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="TOP_LEFT">
+            <ImageView fitHeight="209.0" fitWidth="420.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="TOP_LEFT">
                <image>
                   <Image url="@Icons/KG Logo.png" />
                </image>
@@ -78,13 +78,13 @@
             </ImageView>
          </top>
          <center>
-            <TableView fx:id="tableView" prefHeight="573.0" prefWidth="791.0" styleClass="table" stylesheets="@styles.css" BorderPane.alignment="CENTER">
+            <TableView fx:id="tableView" prefHeight="573.0" prefWidth="791.0" stylesheets="@styles.css" BorderPane.alignment="CENTER">
               <columns>
-                <TableColumn fx:id="colTitle" prefWidth="208.0" text="Title" />
-                <TableColumn fx:id="colArtist" prefWidth="228.0" text="Artist" />
-                  <TableColumn fx:id="colAlbum" prefWidth="177.0" text="Album" />
-                  <TableColumn fx:id="colProduced" prefWidth="97.0" text="Produced" />
-                  <TableColumn fx:id="colDuration" prefWidth="81.0" text="Duration" />
+                  <TableColumn fx:id="colSongID" prefWidth="57.0" text="SongID" />
+                <TableColumn fx:id="colTitle" prefWidth="201.0" text="Title" />
+                  <TableColumn fx:id="colArtistName" prefWidth="245.0" text="Artist" />
+                  <TableColumn fx:id="colAlbumName" prefWidth="259.0" text="Album" />
+                  <TableColumn fx:id="colDuration" prefWidth="84.0" text="Duration" />
               </columns>
             </TableView>
          </center>

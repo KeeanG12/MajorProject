@@ -1,59 +1,98 @@
 package uk.aber.ac.keg21.musicapp;
 
-public class Song {
-    private int songID;
-    private String name;
-    private int albumID;
-    private int artistID;
-    private String duration;
-    
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 
-    public Song(int songID, String name, int albumID, int artistID, String duration) {
-        this.songID = songID;
-        this.name = name;
-        this.albumID = albumID;
-        this.artistID = artistID;
-        this.duration = duration;
-        
-    }
+public class Song {
+    public SimpleIntegerProperty songID = new SimpleIntegerProperty();
+    public SimpleStringProperty name = new SimpleStringProperty();
+    public SimpleIntegerProperty albumID = new SimpleIntegerProperty();
+    public SimpleStringProperty albumName = new SimpleStringProperty();
+//    public SimpleIntegerProperty artistID = new SimpleIntegerProperty();
+    public SimpleStringProperty artistName = new SimpleStringProperty();
+    public SimpleStringProperty duration = new SimpleStringProperty();
 
     public int getSongID() {
+        return songID.get();
+    }
+
+    public SimpleIntegerProperty songIDProperty() {
         return songID;
     }
 
     public void setSongID(int songID) {
-        this.songID = songID;
+        this.songID.set(songID);
     }
 
     public String getName() {
+        return name.get();
+    }
+
+    public SimpleStringProperty nameProperty() {
         return name;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name.set(name);
     }
 
     public int getAlbumID() {
+        return albumID.get();
+    }
+
+    public SimpleIntegerProperty albumIDProperty() {
         return albumID;
     }
 
     public void setAlbumID(int albumID) {
-        this.albumID = albumID;
+        this.albumID.set(albumID);
     }
-
-    public int getArtistID() {
-        return artistID;
-    }
-
-    public void setArtistID(int artistID) {
-        this.artistID = artistID;
-    }
+//
+//    public int getArtistID() {
+//        return artistID.get();
+//    }
+//
+//    public SimpleIntegerProperty artistIDProperty() {
+//        return artistID;
+//    }
+//
+//    public void setArtistID(int artistID) {
+//        this.artistID.set(artistID);
+//    }
 
     public String getDuration() {
+        return duration.get();
+    }
+
+    public SimpleStringProperty durationProperty() {
         return duration;
     }
 
     public void setDuration(String duration) {
-        this.duration = duration;
+        this.duration.set(duration);
+    }
+
+    public String getAlbumName() {
+        return albumName.get();
+    }
+
+    public SimpleStringProperty albumNameProperty() {
+        return albumName;
+    }
+
+    public void setAlbumName(String albumName) {
+        this.albumName.set(albumName);
+    }
+
+    public String getArtistName() {
+        return artistName.get();
+    }
+
+    public SimpleStringProperty artistNameProperty() {
+        return artistName;
+    }
+
+    public void setArtistName(String artistName) {
+        this.artistName.set(artistName);
     }
 }
