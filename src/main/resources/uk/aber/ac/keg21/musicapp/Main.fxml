@@ -20,7 +20,7 @@
       <HBox alignment="CENTER_LEFT" layoutX="21.0" layoutY="668.0" prefHeight="91.0" prefWidth="1200.0" spacing="30.0" styleClass="control-bar-colour" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
             <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="50.0" styleClass="previous-button" stylesheets="@styles.css" text="Previous" />
-            <Button fx:id="playPauseButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#playButton" prefHeight="35.0" prefWidth="50.0" styleClass="play-button" stylesheets="@styles.css" text="Play">
+            <Button fx:id="playPauseButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#playPauseButton" prefHeight="35.0" prefWidth="50.0" styleClass="play-button" stylesheets="@styles.css" text="Play">
                <HBox.margin>
                   <Insets />
                </HBox.margin>

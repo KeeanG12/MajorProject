@@ -1,5 +1,8 @@
 package uk.aber.ac.keg21.musicapp;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TableView;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -141,6 +144,8 @@ public class Database {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+        
+        
 
     }
     
@@ -159,6 +164,49 @@ public class Database {
             
         } catch (SQLException ex) {
             ex.printStackTrace();
+        }
+    }
+
+    private ObservableList<SongDataModel> songList;
+    
+    public void fillTable(TableView tableView) {
+        songList = FXCollections.observableArrayList();
+        
+        //Using SQLite Inner Join to Select 3 tables using albumID
+        String select = "SELECT " +
+                "songID," +
+                "songs.name AS songName," +
+                "artist.name AS artistName," +
+                "album.name AS albumName, " +
+                "songs.duration as duration, " +
+                "songs.filepath AS filepath " +
+                "FROM songs " +
+                "INNER JOIN album ON album.albumID = songs.albumID " +
+                "INNER JOIN artist ON artist.artistID = album.artistID";
+
+        try(Connection conn = this.connect();
+
+            Statement statement = conn.createStatement()) {
+            ResultSet rs = statement.executeQuery(select);
+            //Adding new song to list while ResultSet has next
+            while (rs.next()) {
+                SongDataModel s = new SongDataModel();
+                s.setSongID(rs.getInt("songID"));
+                s.setName(rs.getString("songName"));
+//                s.setArtistID(rs.getInt("artistID"));
+                s.setArtistName(rs.getString("artistName"));
+//                s.setAlbumID(rs.getInt("albumID"));
+                s.setAlbumName(rs.getString("albumName"));
+                s.setDuration(rs.getString("duration"));
+                s.setFilepath(rs.getString("filepath"));
+                songList.add(s);
+            }
+
+            //Adding list to Table once all songs are in list
+            tableView.setItems(songList);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
     
