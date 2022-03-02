@@ -48,6 +48,27 @@
     -fx-background-color: rgba(0,0,0,0);
 }
 
+.browse-folder-button{
+    -fx-graphic: url(Icons/Browse.png);
+    -fx-content-display: graphic-only;
+    -fx-background-color: rgba(0,0,0,0);
+    -fx-border-color: #000000;
+    -fx-border-width: 5px;
+    -fx-border-radius: 15px;
+}
+
+.setting-button-clicked{
+    -fx-graphic: url(Icons/Settings.png);
+    -fx-content-display: left;
+    -fx-background-color: #43cea2;
+}
+
+.songs-button-clicked{
+    -fx-graphic: url(Icons/Song.png);
+    -fx-content-display: left;
+    -fx-background-color: #43cea2;
+}
+
 .table-view{
     -fx-background-color: linear-gradient(to right, #43cea2 , #185a9d) ;
 }

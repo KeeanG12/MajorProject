@@ -4,19 +4,26 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.*;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
+    
+    private Stage stage;
 
     @FXML
     public TableView tableView;
@@ -44,6 +51,9 @@ public class MainController implements Initializable {
 
     @FXML
     public MediaPlayer player;
+    
+    @FXML
+    public Button settingsButton;
 
     @FXML
     public void playButton(ActionEvent actionEvent) throws URISyntaxException {
@@ -65,6 +75,13 @@ public class MainController implements Initializable {
         Media sound = new Media(new File(path).toURI().toString());
         player = new MediaPlayer(sound);
         player.play();
+    }
+    
+    public void settingButton(ActionEvent actionEvent) throws IOException {
+        Parent root = FXMLLoader.load(Main.class.getResource("Setting.fxml"));
+        stage = (Stage) settingsButton.getScene().getWindow();
+        stage.setScene(new Scene(root, 1200, 800));
+        
     }
     
     //Creating the list to populate TableView

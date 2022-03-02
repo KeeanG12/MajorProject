@@ -50,7 +50,7 @@
                         <Insets />
                      </opaqueInsets>
                      <children>
-                        <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="70.0" prefWidth="150.0" styleClass="songs-button" stylesheets="@styles.css" text="Songs">
+                        <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="70.0" prefWidth="150.0" styleClass="songs-button-clicked" stylesheets="@styles.css" text="Songs">
                            <font>
                               <Font size="18.0" />
                            </font></Button>
@@ -58,7 +58,7 @@
                            <font>
                               <Font size="18.0" />
                            </font></Button>
-                        <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="76.0" prefWidth="199.0" styleClass="settings-button" stylesheets="@styles.css" text="Settings">
+                        <Button fx:id="settingsButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#settingButton" prefHeight="76.0" prefWidth="199.0" styleClass="settings-button" stylesheets="@styles.css" text="Settings">
                            <font>
                               <Font size="18.0" />
                            </font></Button>
