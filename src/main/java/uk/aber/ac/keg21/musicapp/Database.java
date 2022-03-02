@@ -18,13 +18,13 @@ import java.sql.*;
 
 public class Database {
 
-    String artist = "Create table if not exists artist(artistID integer primary key NOT NULL, name string NOT NULL)";
+    String ARTIST = "Create table if not exists artist(artistID integer primary key NOT NULL, name string NOT NULL)";
 
-    String album = "Create table if not exists album(albumID integer primary key NOT NULL, name string NOT NULL, produced DATE, artistID integer, foreign key (artistID) REFERENCES artist (artistID));";
+    String ALBUM = "Create table if not exists album(albumID integer primary key NOT NULL, name string NOT NULL, produced DATE, artistID integer, foreign key (artistID) REFERENCES artist (artistID));";
 
-    String song = "Create table if not exists songs(songID integer primary key NOT NULL, name string NOT NULL, albumID Integer,artistID INTEGER, duration string, Foreign key (albumID) references album (albumID), FOREIGN KEY (artistID) references artist (artistID))";
+    String SONG = "Create table if not exists songs(songID integer primary key NOT NULL, name string NOT NULL, albumID Integer,artistID INTEGER, duration string, filepath string, Foreign key (albumID) references album (albumID), FOREIGN KEY (artistID) references artist (artistID))";
 
-    String drop = "DROP TABLE song";
+    String drop = "DROP TABLE artist";
     
     private static Database music = null;
 
@@ -49,9 +49,9 @@ public class Database {
         try (Connection conn = this.connect();
              //Uses prepared statement to pass input parameters
              Statement statement = conn.createStatement()) {
-            statement.executeUpdate(artist);
-            statement.executeUpdate(album);
-            statement.executeUpdate(song);
+            statement.executeUpdate(ARTIST);
+            statement.executeUpdate(ALBUM);
+            statement.executeUpdate(SONG);
 
         } catch ( SQLException e) {
             System.out.println(e.getMessage());
@@ -60,8 +60,8 @@ public class Database {
     
     
 
-    public void insertArtist(int artistID, String artistName) {
-        String artist = "INSERT INTO artist(artistID, name) VALUES(?,?)";
+    public void insertArtist(String artistName) {
+        String artist = "INSERT INTO artist(name) VALUES(?)";
         String sql = "DELETE FROM artist";
         
         try (Connection conn = this.connect();
@@ -70,13 +70,12 @@ public class Database {
             Statement statement1 = conn.createStatement();
             
             
-
-            statement.setInt(1, artistID);
-            statement.setString(2, artistName);
+            
+            statement.setString(1, artistName);
             statement.executeUpdate();
             ResultSet rs = statement1.executeQuery("select * from artist");
             while (rs.next()) {
-                // read the result set
+                // read the result set for debugging
                 System.out.println("ArtistID = " + rs.getInt("artistID"));
                 System.out.println("Name = " + rs.getString("name"));
             }
@@ -86,24 +85,23 @@ public class Database {
     }
 
 
-    public void insertAlbum (int artistID, int albumID, String albumName, int produced) {
+    public void insertAlbum (int artistID, String albumName, int produced) {
 
-        String album = "INSERT INTO album(albumID, name, produced, artistID) VALUES(?,?,?,?)";
+        String album = "INSERT INTO album(name, produced, artistID) VALUES(?,?,?)";
         String sql = "DELETE FROM album";
 
         try (Connection conn = this.connect();
              //Uses prepared statement to pass input parameters
              PreparedStatement statement = conn.prepareStatement(album)) {
             Statement statement1 = conn.createStatement();
-
-            statement.setInt(1, albumID);
-            statement.setString(2, albumName);
-            statement.setInt(3, produced);
-            statement.setInt(4, artistID);
+            
+            statement.setString(1, albumName);
+            statement.setInt(2, produced);
+            statement.setInt(3, artistID);
             statement.executeUpdate();
             ResultSet rs = statement1.executeQuery("select * from album");
             while (rs.next()) {
-                // read the result set
+                // read the result set for debugging
                 System.out.println("AlbumID = " + rs.getInt("albumID"));
                 System.out.println("Name = " + rs.getString("name"));
                 System.out.println("Produced = " + rs.getInt("produced"));
@@ -114,30 +112,31 @@ public class Database {
         }
     }
 
-    public void insertSong(int albumID, int songID, String songName, int artistID, String duration) {
+    public void insertSong(int albumID, String songName, int artistID, String duration, String filepath) {
 
-        String song = "INSERT INTO songs(songID, name, albumID, artistID, duration) VALUES(?,?,?,?,?)";
+        String song = "INSERT INTO songs(name, albumID, artistID, duration, filepath) VALUES(?,?,?,?,?)";
         String sql = "DELETE FROM songs";
 
         try (Connection conn = this.connect();
              //Uses prepared statement to pass input parameters
              PreparedStatement statement = conn.prepareStatement(song)) {
             Statement statement1 = conn.createStatement();
-
-            statement.setInt(1, songID);
-            statement.setString(2, songName);
-            statement.setInt(3, albumID);
-            statement.setInt(4, artistID);
-            statement.setString(5, duration);
+            
+            statement.setString(1, songName);
+            statement.setInt(2, albumID);
+            statement.setInt(3, artistID);
+            statement.setString(4, duration);
+            statement.setString(5, filepath);
             statement.executeUpdate();
             ResultSet rs = statement1.executeQuery("select * from songs");
             while (rs.next()) {
-                // read the result set
+                // read the result set for debugging
                 System.out.println("SongID = " + rs.getInt("songID"));
                 System.out.println("Name = " + rs.getString("name"));
                 System.out.println("AlbumID = " + rs.getInt("albumID"));
                 System.out.println("ArtistID = " + rs.getInt("artistID"));
                 System.out.println("Duration = " + rs.getString("duration"));
+                System.out.println("File Path = " + rs.getString("filepath"));
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -180,36 +179,31 @@ public class Database {
         return exists;
     }
     
-    int dbID = 1;
-    
     
     
     private int getID(String name, String table, String idType) {
+        int id = 0;
+        //Select statement to find the ID of on album, artist or song based on arguments
         String sql = "SELECT * from '"+table+"' WHERE name = '"+name+"'";
 
         try(Connection conn = this.connect();
             Statement statement = conn.createStatement();
             ResultSet resultSet = statement.executeQuery(sql)) {
-            dbID = resultSet.getInt( idType);
+            //Set return ID as ID in result set
             while (resultSet.next()) {
-                dbID = resultSet.getInt( idType);
-                System.out.println(resultSet.getInt(idType));
+                id = resultSet.getInt( idType);
             }
+            
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return dbID;
+        return id;
     }
     
 
     //Variables for Number of files, Number of directories and track number
     private int numFiles;
     private int numDirectories;
-    
-    int previousID = 0;
-    int artistID = 1;
-    int albumID = 100;
-    int songID = 1000;
 
     /**
      * Scans file recursivley and populates SQLite DB with each files tag data
@@ -257,14 +251,18 @@ public class Database {
                 String album = v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM);
                 String song = v2tag.getFirst(ID3v24Frames.FRAME_ID_TITLE);
                 
+                int artistID = getID(artist, "artist", "artistID");
+                int albumID = getID(album, "album", "artistID");
+                
+                
                 
                 //Checks if current artist already exists in database and gets the ID if true
-                if(checkExists(artist, "artist", "artistID") && artistID != previousID) {
+                if(checkExists(artist, "artist", "artistID")) {
                     artistID = getID(artist, "artist", "artistID");
-                    System.out.println(artistID);
                 //Adds the current artist if they don't exist in the database    
                 } else {
-                    insertArtist(artistID, artist);
+                    insertArtist(artist);
+                    artistID = getID(artist, "artist", "artistID");
                 }
                 //Checks if current album already exists in database and gets the ID if true
                 if(checkExists(album, "album", "albumID")) {
@@ -272,17 +270,15 @@ public class Database {
                     System.out.println(albumID);
                 //Adds current album if it doesn't exist in the database    
                 } else {
-                    insertAlbum(artistID, albumID, album, Integer.parseInt(v2tag.getFirst(FieldKey.YEAR)));
+                    insertAlbum(artistID, album, Integer.parseInt(v2tag.getFirst(FieldKey.YEAR)));
+                    albumID = getID(album, "album", "albumID");
                 }
                 //Adds current song
-                insertSong(albumID, songID, song, artistID, (audioHeader.getTrackLengthAsString()));
+                String filepath = file.getAbsolutePath();
+                insertSong(albumID, song, artistID, (audioHeader.getTrackLengthAsString()), filepath);
                 
                 //Adding 1 to each ID
                 numFiles++;
-                previousID = albumID;
-                albumID++;
-                artistID++;
-                songID++;
                 
                 
                 } else {

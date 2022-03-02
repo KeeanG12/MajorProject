@@ -3,14 +3,14 @@ package uk.aber.ac.keg21.musicapp;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
-public class Song {
+public class SongDataModel {
     public SimpleIntegerProperty songID = new SimpleIntegerProperty();
     public SimpleStringProperty name = new SimpleStringProperty();
     public SimpleIntegerProperty albumID = new SimpleIntegerProperty();
     public SimpleStringProperty albumName = new SimpleStringProperty();
-//    public SimpleIntegerProperty artistID = new SimpleIntegerProperty();
     public SimpleStringProperty artistName = new SimpleStringProperty();
     public SimpleStringProperty duration = new SimpleStringProperty();
+    public SimpleStringProperty filepath = new SimpleStringProperty();
 
     public int getSongID() {
         return songID.get();
@@ -94,5 +94,17 @@ public class Song {
 
     public void setArtistName(String artistName) {
         this.artistName.set(artistName);
+    }
+
+    public String getFilepath() {
+        return filepath.get();
+    }
+
+    public SimpleStringProperty filepathProperty() {
+        return filepath;
+    }
+
+    public void setFilepath(String filepath) {
+        this.filepath.set(filepath);
     }
 }
