@@ -24,7 +24,7 @@ public class Database {
 
     String SONG = "Create table if not exists songs(songID integer primary key NOT NULL, name string NOT NULL, albumID Integer,artistID INTEGER, duration string, filepath string, Foreign key (albumID) references album (albumID), FOREIGN KEY (artistID) references artist (artistID))";
 
-    String drop = "DROP TABLE artist";
+    String dropSongs = "DROP TABLE songs";
     
     private static Database music = null;
 
