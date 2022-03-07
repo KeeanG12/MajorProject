@@ -16,12 +16,15 @@ import javafx.scene.image.ImageView;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.*;
+import java.util.ListIterator;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
@@ -32,72 +35,148 @@ public class MainController implements Initializable {
     public TableView tableView;
     
     @FXML
-    public TableColumn colSongID;
+    private TableColumn colSongID;
     
     @FXML
-    public TableColumn colTitle;
+    private TableColumn colTitle;
     
     @FXML
-    public TableColumn colArtistName;
+    private TableColumn colArtistName;
 
     @FXML
-    public TableColumn colAlbumName;
+    private TableColumn colAlbumName;
     
     @FXML
-    public TableColumn colDuration;
+    private TableColumn colDuration;
     
     @FXML
-    public Button playPauseButton;
+    private Button playPauseButton;
     
     @FXML
-    public Label currentSong;
+    private Label currentSong;
 
     @FXML
-    public MediaPlayer player;
+    private MediaPlayer player1;
+    private MediaPlayer player2;
+    
+    @FXML
+    private Label currentTime;
+    
+    @FXML
+    private Label totalDuration;
+    
+    @FXML
+    private Slider timeSlider;
+    
+    @FXML
+    public Button nextButton;
+
+    @FXML
+    public Button previousButton;
+    
     
     @FXML
     public Button settingsButton;
     
+    @FXML
+    public Button pauseButton;
+
+    private ImageView play;
+    private ImageView pause;
     
-    private boolean isPaused = true;
-    private boolean isPlaying;
+    private boolean isPlaying = false;
     private boolean isEnd;
+    private String previousSong = "";
+
+    Duration time = new Duration(0.0);
+    
+    private String currentFile;
+
+    //Creating a selection model for playing songs
+    TableView.TableViewSelectionModel<SongDataModel> selectionModel;
+    
+    
     
 
     @FXML
-    public void playPauseButton(ActionEvent actionEvent) throws URISyntaxException {
+    public void playButton() throws URISyntaxException {
         //Getting the selection model to know which cell the user selects
-        TableView.TableViewSelectionModel<SongDataModel> selectionModel = tableView.getSelectionModel();
-        
+        selectionModel = tableView.getSelectionModel();
+
         //Setting selection mode to single, so they can only select a single cell
         selectionModel.setSelectionMode(SelectionMode.SINGLE);
         SongDataModel selected = selectionModel.getSelectedItem();
-        
+
         //Finding the directory path from the selected cell data
         String artist = selected.getArtistName();
         currentSong.setText(artist + " - " + selected.getName());
-        
+
 
         //Uses JavaFX-Media to play a MP3 file when button is clicked
         String path = selected.getFilepath();
+        currentFile = path;
         Media sound = new Media(new File(path).toURI().toString());
-        player = new MediaPlayer(sound);
+        player1 = new MediaPlayer(sound);
         
-        if(isPlaying) {
-            isPlaying = false;
-            isPaused = true;
-            player.pause();
-        } else if(isPaused) {
-            isPaused = false;
+        if (!isPlaying) {
+            
+            if(time != new Duration(0.0)) {
+                player1.setStartTime(time);
+                player1.play();
+                time = new Duration(0.0);
+            } else {
+                player1.play();
+            }
+            
             isPlaying = true;
-            player.play();
         }
     }
     
+    @FXML
+    public void pauseButton() throws URISyntaxException {
+        //Set the time to the song time when it was paused
+        
+        time = player1.getCurrentTime();
+        //Pause player and set playing to false
+        player1.pause();
+        isPlaying = false;
+        
+    }
+    
+    @FXML
+    public void nextButton() {
+        player1.stop();
+        
+        //Use the findNext method to find the next file and reassign the player to it
+        currentFile = findNext();
+        Media sound = new Media(new File(currentFile).toURI().toString());
+        player1 = new MediaPlayer(sound);
+        
+        
+        player1.play();
+    }
+
+    @FXML
+    public void previousButton() {
+        player1.stop();
+
+        //Use the findNext method to find the next file and reassign the player to it
+        currentFile = findPrevious();
+        Media sound = new Media(new File(currentFile).toURI().toString());
+        player1 = new MediaPlayer(sound);
+
+
+        player1.play();
+    }
+    
     public void settingButton(ActionEvent actionEvent) throws IOException {
+        if(player1 != null) {
+            player1.stop();
+        }
         Parent root = FXMLLoader.load(Main.class.getResource("Setting.fxml"));
         stage = (Stage) settingsButton.getScene().getWindow();
         stage.setScene(new Scene(root, 1200, 800));
+        stage.setFullScreen(true);
         
     }
 
@@ -111,6 +190,45 @@ public class MainController implements Initializable {
             System.out.println(e.getMessage());
         }
         return conn;
+    }
+    
+    
+    public String findNext() {
+        Database music = Database.getInstance();
+        
+        
+        String nextFilepath = "";
+        Boolean found = false;
+        SongDataModel nextSong = new SongDataModel();
+
+        for (SongDataModel song: music.songList) {
+            if(song.getFilepath() == currentFile) {
+               nextSong =  music.songList.get(music.songList.indexOf(song) + 1);
+               nextFilepath = nextSong.getFilepath();
+               currentSong.setText(nextSong.getArtistName()+ " - "+ nextSong.getName());
+                System.out.println(nextFilepath);
+            }
+        }
+        return nextFilepath;
+    }
+
+    public String findPrevious() {
+        Database music = Database.getInstance();
+
+
+        String previousFilepath = "";
+        Boolean found = false;
+        SongDataModel previousSong = new SongDataModel();
+
+        for (SongDataModel song: music.songList) {
+            if(song.getFilepath() == currentFile) {
+                previousSong =  music.songList.get(music.songList.indexOf(song) - 1);
+                previousFilepath = previousSong.getFilepath();
+                currentSong.setText(previousSong.getArtistName()+ " - "+ previousSong.getName());
+                System.out.println(previousFilepath);
+            }
+        }
+        return previousFilepath;
     }
     
     

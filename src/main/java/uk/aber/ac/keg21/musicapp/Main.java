@@ -16,6 +16,7 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("Main.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1200, 800);
+        stage.setFullScreen(true);
         stage.setTitle("KG Music Player");
         stage.setScene(scene);
         stage.show();

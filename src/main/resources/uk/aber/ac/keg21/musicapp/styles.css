@@ -11,8 +11,24 @@
     -fx-background-radius: 0 30 30 0;
 }
 
+.button:hover {
+    -fx-background-color: #D3D3D3;
+}
+
+.button:pressed {
+    -fx-background-color: #43cea2;
+    -fx-scale-x: 0.9;
+    -fx-scale-y: 0.9;
+}
+
 .play-button{
     -fx-graphic: url(Icons/Play.png);
+    -fx-content-display: graphic-only;
+    -fx-background-color: rgba(0,0,0,0);
+}
+
+.pause-button{
+    -fx-graphic: url(Icons/Pause.png);
     -fx-content-display: graphic-only;
     -fx-background-color: rgba(0,0,0,0);
 }

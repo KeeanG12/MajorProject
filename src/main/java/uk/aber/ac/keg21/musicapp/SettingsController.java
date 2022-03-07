@@ -36,9 +36,11 @@ public class SettingsController implements Initializable {
     public Button scanButton;
     
     public void songButton(ActionEvent actionEvent) throws IOException {
+        
         Parent root = FXMLLoader.load(Main.class.getResource("Main.fxml"));
         stage = (Stage) songsButton.getScene().getWindow();
         stage.setScene(new Scene(root, 1200, 800));
+        stage.setFullScreen(true);
         
     }
     
