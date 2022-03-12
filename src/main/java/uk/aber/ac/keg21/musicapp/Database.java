@@ -77,11 +77,11 @@ public class Database {
             statement.setString(1, artistName);
             statement.executeUpdate();
             ResultSet rs = statement1.executeQuery("select * from artist");
-            while (rs.next()) {
-                // read the result set for debugging
-                System.out.println("ArtistID = " + rs.getInt("artistID"));
-                System.out.println("Name = " + rs.getString("name"));
-            }
+//            while (rs.next()) {
+//                // read the result set for debugging
+//                System.out.println("ArtistID = " + rs.getInt("artistID"));
+//                System.out.println("Name = " + rs.getString("name"));
+//            }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -103,13 +103,13 @@ public class Database {
             statement.setInt(3, artistID);
             statement.executeUpdate();
             ResultSet rs = statement1.executeQuery("select * from album");
-            while (rs.next()) {
-                // read the result set for debugging
-                System.out.println("AlbumID = " + rs.getInt("albumID"));
-                System.out.println("Name = " + rs.getString("name"));
-                System.out.println("Produced = " + rs.getInt("produced"));
-                System.out.println("ArtistID = " + rs.getInt("artistID"));
-            }
+//            while (rs.next()) {
+//                // read the result set for debugging
+//                System.out.println("AlbumID = " + rs.getInt("albumID"));
+//                System.out.println("Name = " + rs.getString("name"));
+//                System.out.println("Produced = " + rs.getInt("produced"));
+//                System.out.println("ArtistID = " + rs.getInt("artistID"));
+//            }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -132,15 +132,15 @@ public class Database {
             statement.setString(5, filepath);
             statement.executeUpdate();
             ResultSet rs = statement1.executeQuery("select * from songs");
-            while (rs.next()) {
-                // read the result set for debugging
-                System.out.println("SongID = " + rs.getInt("songID"));
-                System.out.println("Name = " + rs.getString("name"));
-                System.out.println("AlbumID = " + rs.getInt("albumID"));
-                System.out.println("ArtistID = " + rs.getInt("artistID"));
-                System.out.println("Duration = " + rs.getString("duration"));
-                System.out.println("File Path = " + rs.getString("filepath"));
-            }
+//            while (rs.next()) {
+//                // read the result set for debugging
+//                System.out.println("SongID = " + rs.getInt("songID"));
+//                System.out.println("Name = " + rs.getString("name"));
+//                System.out.println("AlbumID = " + rs.getInt("albumID"));
+//                System.out.println("ArtistID = " + rs.getInt("artistID"));
+//                System.out.println("Duration = " + rs.getString("duration"));
+//                System.out.println("File Path = " + rs.getString("filepath"));
+//            }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }

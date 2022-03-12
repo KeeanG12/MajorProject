@@ -89,23 +89,18 @@ public class MainController implements Initializable {
     private String previousSong = "";
 
     Duration time = new Duration(0.0);
+
+    Database music = Database.getInstance();
     
     private String currentFile;
 
     //Creating a selection model for playing songs
     TableView.TableViewSelectionModel<SongDataModel> selectionModel;
     
-    
-    
-
     @FXML
     public void playButton() throws URISyntaxException {
-        //Getting the selection model to know which cell the user selects
-        selectionModel = tableView.getSelectionModel();
-
-        //Setting selection mode to single, so they can only select a single cell
-        selectionModel.setSelectionMode(SelectionMode.SINGLE);
-        SongDataModel selected = selectionModel.getSelectedItem();
+        
+        SongDataModel selected = getSelected();
 
         //Finding the directory path from the selected cell data
         String artist = selected.getArtistName();
@@ -132,11 +127,23 @@ public class MainController implements Initializable {
         }
     }
     
+    private SongDataModel getSelected() {
+        //Getting the selection model to know which cell the user selects
+        selectionModel = tableView.getSelectionModel();
+
+        //Setting selection mode to single, so they can only select a single cell
+        selectionModel.setSelectionMode(SelectionMode.SINGLE);
+        SongDataModel selected = selectionModel.getSelectedItem();
+        
+        return selected;
+    }
+    
     @FXML
     public void pauseButton() throws URISyntaxException {
         //Set the time to the song time when it was paused
         
         time = player1.getCurrentTime();
+        System.out.println(time);
         //Pause player and set playing to false
         player1.pause();
         isPlaying = false;
@@ -152,6 +159,9 @@ public class MainController implements Initializable {
         Media sound = new Media(new File(currentFile).toURI().toString());
         player1 = new MediaPlayer(sound);
         
+        //Getting the index of current file and selecting that
+        int index = findIndex(currentFile);
+        selectionModel.select(index);
         
         player1.play();
     }
@@ -165,6 +175,10 @@ public class MainController implements Initializable {
         Media sound = new Media(new File(currentFile).toURI().toString());
         player1 = new MediaPlayer(sound);
 
+        //Getting the index of current file and selecting that
+        int index = findIndex(currentFile);
+        selectionModel.select(index);
+
 
         player1.play();
     }
@@ -175,7 +189,7 @@ public class MainController implements Initializable {
         }
         Parent root = FXMLLoader.load(Main.class.getResource("Setting.fxml"));
         stage = (Stage) settingsButton.getScene().getWindow();
-        stage.setScene(new Scene(root, 1200, 800));
+        stage.setScene(new Scene(root));
         stage.setFullScreen(true);
         
     }
@@ -192,9 +206,20 @@ public class MainController implements Initializable {
         return conn;
     }
     
+    public int findIndex(String currentFile) {
+        int index = 0;
+        
+        
+        for (SongDataModel song: music.songList) {
+            if (song.getFilepath() == currentFile) {
+                index = music.songList.indexOf(song);
+            }
+        }
+        return index;
+    }
+    
     
     public String findNext() {
-        Database music = Database.getInstance();
         
         
         String nextFilepath = "";
@@ -213,9 +238,7 @@ public class MainController implements Initializable {
     }
 
     public String findPrevious() {
-        Database music = Database.getInstance();
-
-
+        
         String previousFilepath = "";
         Boolean found = false;
         SongDataModel previousSong = new SongDataModel();
@@ -230,11 +253,28 @@ public class MainController implements Initializable {
         }
         return previousFilepath;
     }
+
+    public void playOnEnd() {
+        
+        if(player1 != null) {
+            player1.setOnEndOfMedia(() -> {
+                Media sound = new Media(new File(findNext()).toURI().toString());
+                player1 = new MediaPlayer(sound);
+
+            });
+            player1.play();
+        }
+        
+    }
+    
+    
     
     
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        
+        
         
         //Setting the CellValue with the Song class as a Data Model
         colSongID.setCellValueFactory(

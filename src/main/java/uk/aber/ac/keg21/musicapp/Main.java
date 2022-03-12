@@ -15,7 +15,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("Main.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 1200, 800);
+        Scene scene = new Scene(fxmlLoader.load());
         stage.setFullScreen(true);
         stage.setTitle("KG Music Player");
         stage.setScene(scene);
@@ -25,7 +25,6 @@ public class Main extends Application {
     
     public static void main(String[] args) throws IOException {
         launch();
-        
         Database music = Database.getInstance();
 //        music.startUp();
 //        music.rescan(new File("D:/UniWork/Third Year/Major Project/MajorProject/src/main/resources/Tunes"));
