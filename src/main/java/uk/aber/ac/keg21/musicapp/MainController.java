@@ -1,9 +1,9 @@
 package uk.aber.ac.keg21.musicapp;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -11,7 +11,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -23,8 +22,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.*;
-import java.util.ListIterator;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
@@ -60,13 +57,13 @@ public class MainController implements Initializable {
     private MediaPlayer player2;
     
     @FXML
-    private Label currentTime;
+    public Slider timeSlider;
     
     @FXML
-    private Label totalDuration;
+    public Label totalDuration;
     
     @FXML
-    private Slider timeSlider;
+    public Slider volumeSlider;
     
     @FXML
     public Button nextButton;
@@ -80,6 +77,9 @@ public class MainController implements Initializable {
     
     @FXML
     public Button pauseButton;
+    
+    @FXML
+    public Button shuffleButton;
 
     private ImageView play;
     private ImageView pause;
@@ -87,6 +87,8 @@ public class MainController implements Initializable {
     private boolean isPlaying = false;
     private boolean isEnd;
     private String previousSong = "";
+    
+    private double volume = 1.0;
 
     Duration time = new Duration(0.0);
 
@@ -96,6 +98,38 @@ public class MainController implements Initializable {
 
     //Creating a selection model for playing songs
     TableView.TableViewSelectionModel<SongDataModel> selectionModel;
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        //Setting the CellValue with the Song class as a Data Model
+        colSongID.setCellValueFactory(
+                new PropertyValueFactory<SongDataModel, Integer>("songID")
+        );
+
+        colTitle.setCellValueFactory(
+                new PropertyValueFactory<SongDataModel, String>("name")
+        );
+
+        colArtistName.setCellValueFactory(
+                new PropertyValueFactory<SongDataModel, String>("artistName")
+        );
+
+        colAlbumName.setCellValueFactory(
+                new PropertyValueFactory<SongDataModel, String>("albumName")
+        );
+
+        colDuration.setCellValueFactory(
+                new PropertyValueFactory<SongDataModel, Integer>("duration")
+        );
+
+        Database music = Database.getInstance();
+        music.fillTable(tableView);
+
+
+    }
+    
+    
     
     @FXML
     public void playButton() throws URISyntaxException {
@@ -123,8 +157,12 @@ public class MainController implements Initializable {
                 player1.play();
             }
             
+            changeVolume();
+            songDuration(selected.getDuration());
+            
             isPlaying = true;
         }
+        
     }
     
     private SongDataModel getSelected() {
@@ -148,6 +186,12 @@ public class MainController implements Initializable {
         player1.pause();
         isPlaying = false;
         
+        
+    }
+    
+    public void shuffleButton() {
+        Database music = Database.getInstance();
+        music.shuffleTable(tableView);
     }
     
     @FXML
@@ -162,6 +206,9 @@ public class MainController implements Initializable {
         //Getting the index of current file and selecting that
         int index = findIndex(currentFile);
         selectionModel.select(index);
+        
+        changeVolume();
+        songDuration(getSelected().getDuration());
         
         player1.play();
     }
@@ -178,9 +225,76 @@ public class MainController implements Initializable {
         //Getting the index of current file and selecting that
         int index = findIndex(currentFile);
         selectionModel.select(index);
+        
+        changeVolume();
+        songDuration(getSelected().getDuration());
 
 
         player1.play();
+    }
+    
+    
+    public String getTimeFormatted(Duration currentTime) {
+        
+        //Casting currentTime Duration to integer for easier formatting
+        int seconds = (int) currentTime.toSeconds();
+        int minutes = (int) currentTime.toMinutes();
+        
+        //If seconds or minutes are greater than 59 then wrap using modulo
+        if(seconds > 59) {
+            seconds = seconds % 60;
+        }
+        
+        if(minutes > 59) {
+            minutes = minutes % 60;
+        }
+        
+        //Formatting the string correctly using .format and % to represent integers
+        String time = String.format("%02d:%02d", minutes, seconds);
+        
+        return time;
+    }
+    
+    
+    private void changeVolume() {
+            //Setting slider value to current player volume * 100 as the volume range is 0.0 - 1.0
+            volumeSlider.setValue(player1.getVolume() * 100);
+
+            //Setting the volume to slider value / 100 if the slider value changes
+            volumeSlider.valueProperty().addListener(observable -> player1.setVolume(volumeSlider.getValue() / 100));
+            
+    }
+    
+    private void songDuration(String duration) {
+        
+        //Adding a Change Listener to the total duration property so if the song changes the slider's max changes
+        player1.totalDurationProperty().addListener(new ChangeListener<Duration>() {
+            @Override
+            public void changed(ObservableValue<? extends Duration> observableValue, Duration previousDuration, Duration newDuration) {
+                timeSlider.setMax(newDuration.toSeconds());
+                totalDuration.setText(getTimeFormatted(newDuration));
+                timeSlider.setValue(0.0);
+            }
+        });
+        
+        //When the sliders value changes, if the old val difference is more than 0.5s then use seek() to play song from newVal
+        timeSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number previousVal, Number newVal) {
+                double currentTime = player1.getCurrentTime().toSeconds();
+                if(Math.abs(currentTime - newVal.doubleValue()) > 0.5) {
+                    player1.seek(Duration.seconds(newVal.doubleValue()));
+                }
+            }
+        });
+        
+        //While the current time changes set the labels text to current time
+        player1.currentTimeProperty().addListener(observable -> {
+
+           totalDuration.setText(getTimeFormatted(player1.getCurrentTime()) + " / " + duration);
+        });
+        
+        
     }
     
     public void settingButton(ActionEvent actionEvent) throws IOException {
@@ -260,46 +374,10 @@ public class MainController implements Initializable {
             player1.setOnEndOfMedia(() -> {
                 Media sound = new Media(new File(findNext()).toURI().toString());
                 player1 = new MediaPlayer(sound);
+                player1.play();
 
             });
-            player1.play();
         }
         
-    }
-    
-    
-    
-    
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        
-        
-        
-        //Setting the CellValue with the Song class as a Data Model
-        colSongID.setCellValueFactory(
-                new PropertyValueFactory<SongDataModel, Integer>("songID")
-        );
-
-        colTitle.setCellValueFactory(
-                new PropertyValueFactory<SongDataModel, String>("name")
-        );
-
-        colArtistName.setCellValueFactory(
-                new PropertyValueFactory<SongDataModel, String>("artistName")
-        );
-
-        colAlbumName.setCellValueFactory(
-                new PropertyValueFactory<SongDataModel, String>("albumName")
-        );
-
-        colDuration.setCellValueFactory(
-                new PropertyValueFactory<SongDataModel, Integer>("duration")
-        );
-        
-        Database music = Database.getInstance();
-        music.fillTable(tableView);
-
-
     }
 }

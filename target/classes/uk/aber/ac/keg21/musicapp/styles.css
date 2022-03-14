@@ -46,6 +46,12 @@
     
 }
 
+.shuffle-button{
+    -fx-graphic: url(Icons/Shuffle.png);
+    -fx-content-display: graphic-only;
+    -fx-background-color: rgba(0,0,0,0);
+}
+
 .settings-button{
     -fx-graphic: url(Icons/Settings.png);
     -fx-content-display: left;

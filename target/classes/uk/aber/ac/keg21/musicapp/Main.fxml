@@ -19,6 +19,23 @@
    <children>
       <HBox alignment="CENTER" layoutX="21.0" layoutY="668.0" prefHeight="108.0" prefWidth="1800.0" spacing="10.0" styleClass="control-bar-colour" stylesheets="@styles.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+               <children>
+                  <ImageView fitHeight="58.0" fitWidth="64.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@Icons/Volume.png" />
+                     </image>
+                  </ImageView>
+                  <Slider fx:id="volumeSlider">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </Slider>
+               </children>
+               <HBox.margin>
+                  <Insets right="150.0" />
+               </HBox.margin>
+            </HBox>
             <Button fx:id="previousButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#previousButton" prefHeight="72.0" prefWidth="40.0" styleClass="previous-button" stylesheets="@styles.css" text="Previous" />
             <Button fx:id="playButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#playButton" prefHeight="64.0" prefWidth="67.0" styleClass="play-button" stylesheets="@styles.css" text="Play">
                <HBox.margin>
@@ -40,7 +57,7 @@
                      </padding></Slider>
                </children>
             </VBox>
-            <Label fx:id="totalDuration" alignment="CENTER" prefHeight="52.0" prefWidth="75.0" text="4:00">
+            <Label fx:id="totalDuration" alignment="CENTER" prefHeight="52.0" prefWidth="217.0" text="--/--">
                <font>
                   <Font size="18.0" />
                </font>
@@ -48,6 +65,11 @@
                   <Insets right="25.0" top="25.0" />
                </padding>
             </Label>
+            <Button fx:id="shuffleButton" mnemonicParsing="false" onAction="#shuffleButton" prefHeight="62.0" prefWidth="81.0" styleClass="shuffle-button" stylesheets="@styles.css" text="Button">
+               <HBox.margin>
+                  <Insets right="20.0" />
+               </HBox.margin>
+            </Button>
          </children>
          <padding>
             <Insets left="20.0" top="20.0" />

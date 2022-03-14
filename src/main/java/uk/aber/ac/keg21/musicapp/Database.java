@@ -210,6 +210,11 @@ public class Database {
         }
     }
     
+    public void shuffleTable(TableView tableView) {
+        FXCollections.shuffle(songList);
+        tableView.setItems(songList);
+    }
+    
     private boolean checkExists(String name, String table, String idType) {
         String sql = "SELECT '"+idType+"', name FROM '"+table+"' WHERE name = '"+name+"'";
         
