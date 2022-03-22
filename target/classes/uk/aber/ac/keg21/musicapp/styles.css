@@ -13,6 +13,8 @@
 
 .button:hover {
     -fx-background-color: #D3D3D3;
+    -fx-border-width: 5px;
+    -fx-border-radius:4px;
 }
 
 .button:pressed {

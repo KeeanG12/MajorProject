@@ -4,6 +4,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -11,6 +12,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -47,7 +49,7 @@ public class MainController implements Initializable {
     private TableColumn colDuration;
     
     @FXML
-    private Button playPauseButton;
+    private Button playButton;
     
     @FXML
     private Label currentSong;
@@ -81,8 +83,8 @@ public class MainController implements Initializable {
     @FXML
     public Button shuffleButton;
 
-    private ImageView play;
-    private ImageView pause;
+    Image pause = new Image("D:\\UniWork\\Third Year\\Major Project\\MajorProject\\src\\main\\resources\\uk\\aber\\ac\\keg21\\musicapp\\Icons\\Pause.png");
+    Image play = new Image("D:\\UniWork\\Third Year\\Major Project\\MajorProject\\src\\main\\resources\\uk\\aber\\ac\\keg21\\musicapp\\Icons\\Play.png");
     
     private boolean isPlaying = false;
     private boolean isEnd;
@@ -126,6 +128,33 @@ public class MainController implements Initializable {
         Database music = Database.getInstance();
         music.fillTable(tableView);
 
+        
+        Image pause = new Image("D:\\UniWork\\Third Year\\Major Project\\MajorProject\\src\\main\\resources\\uk\\aber\\ac\\keg21\\musicapp\\Icons\\Pause.png");
+        Image play = new Image("D:\\UniWork\\Third Year\\Major Project\\MajorProject\\src\\main\\resources\\uk\\aber\\ac\\keg21\\musicapp\\Icons\\Play.png");
+        
+        //Setting the on action event handler for the Play/Pause Button
+        playButton.setOnAction(e -> {
+            
+            playButton = (Button) e.getSource();
+            if(!isPlaying) {
+                try {
+                    //Call Play Button method and set the graphic to Pause
+                    playButton();
+                    playButton.setGraphic(new ImageView(pause));
+                } catch (URISyntaxException ex) {
+                    ex.printStackTrace();
+                }
+            } else {
+                try {
+                    //Call Pause button method and set the graphic to Play
+                    pauseButton();
+                    playButton.setGraphic(new ImageView(play));
+                } catch (URISyntaxException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+        });
 
     }
     
@@ -149,12 +178,21 @@ public class MainController implements Initializable {
         
         if (!isPlaying) {
             
-            if(time != new Duration(0.0)) {
+//            if(time != new Duration(0.0)) {
+//                player1.setStartTime(time);
+//                player1.play();
+//                System.out.println(player1.startTimeProperty());
+//                time = new Duration(0.0);
+//            } else {
+//                player1.play();
+//            }
+            
+            if(time == new Duration(0.0)) {
+                player1.play();
+            } else {
                 player1.setStartTime(time);
                 player1.play();
-                time = new Duration(0.0);
-            } else {
-                player1.play();
+                
             }
             
             changeVolume();
@@ -164,6 +202,8 @@ public class MainController implements Initializable {
         }
         
     }
+    
+    
     
     private SongDataModel getSelected() {
         //Getting the selection model to know which cell the user selects
@@ -209,6 +249,7 @@ public class MainController implements Initializable {
         
         changeVolume();
         songDuration(getSelected().getDuration());
+        playButton.setGraphic(new ImageView(pause));
         
         player1.play();
     }

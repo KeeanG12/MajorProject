@@ -21,7 +21,7 @@
          <children>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
                <children>
-                  <ImageView fitHeight="58.0" fitWidth="64.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="60.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@Icons/Volume.png" />
                      </image>
@@ -42,7 +42,6 @@
                   <Insets />
                </HBox.margin>
             </Button>
-            <Button fx:id="pauseButton" mnemonicParsing="false" onAction="#pauseButton" styleClass="pause-button" stylesheets="@styles.css" text="Button" />
             <Button fx:id="nextButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#nextButton" prefHeight="35.0" prefWidth="40.0" styleClass="next-button" stylesheets="@styles.css" text="Next" />
             <VBox alignment="CENTER" prefHeight="91.0" prefWidth="844.0">
                <children>
