@@ -6,6 +6,7 @@
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -103,16 +104,6 @@
                </children>
             </Pane>
          </left>
-         <top>
-            <ImageView fitHeight="209.0" fitWidth="420.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="TOP_LEFT">
-               <image>
-                  <Image url="@Icons/KG Logo.png" />
-               </image>
-               <BorderPane.margin>
-                  <Insets left="20.0" />
-               </BorderPane.margin>
-            </ImageView>
-         </top>
          <center>
             <TableView fx:id="tableView" prefHeight="750.0" prefWidth="1568.0" stylesheets="@styles.css" BorderPane.alignment="CENTER">
               <columns>
@@ -133,6 +124,18 @@
          <opaqueInsets>
             <Insets />
          </opaqueInsets>
+         <top>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <ImageView fitHeight="306.0" fitWidth="475.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@Icons/KG Logo.png" />
+                     </image>
+                  </ImageView>
+                  <TextField fx:id="searchField" prefHeight="25.0" prefWidth="193.0" promptText="Enter Artist, Album or Track..." />
+               </children>
+            </HBox>
+         </top>
       </BorderPane>
    </children>
 </AnchorPane>

@@ -168,6 +168,8 @@ public class Database {
     }
 
     public ObservableList<SongDataModel> songList;
+
+    public SongDataModel song = new SongDataModel();
     
     public void fillTable(TableView tableView) {
         songList = FXCollections.observableArrayList();

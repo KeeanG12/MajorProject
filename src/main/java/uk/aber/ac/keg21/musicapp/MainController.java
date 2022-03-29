@@ -3,6 +3,8 @@ package uk.aber.ac.keg21.musicapp;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -82,11 +84,16 @@ public class MainController implements Initializable {
     
     @FXML
     public Button shuffleButton;
+    
+    @FXML
+    public TextField searchField;
+    
 
     Image pause = new Image("D:\\UniWork\\Third Year\\Major Project\\MajorProject\\src\\main\\resources\\uk\\aber\\ac\\keg21\\musicapp\\Icons\\Pause.png");
     Image play = new Image("D:\\UniWork\\Third Year\\Major Project\\MajorProject\\src\\main\\resources\\uk\\aber\\ac\\keg21\\musicapp\\Icons\\Play.png");
     
     private boolean isPlaying = false;
+    private boolean isPaused = false;
     private boolean isEnd;
     private String previousSong = "";
     
@@ -103,7 +110,6 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
         //Setting the CellValue with the Song class as a Data Model
         colSongID.setCellValueFactory(
                 new PropertyValueFactory<SongDataModel, Integer>("songID")
@@ -128,9 +134,43 @@ public class MainController implements Initializable {
         Database music = Database.getInstance();
         music.fillTable(tableView);
 
+        FilteredList<SongDataModel> filteredList = new FilteredList<>(music.songList, b -> true);
+
+        searchField.textProperty().addListener((observable, oldVal, newVal) -> {
+            filteredList.setPredicate(songDataModel -> {
+
+                //If there is no changes then display all cells
+                if(newVal == null || newVal.isBlank() || newVal.isEmpty()) {
+                    return true;
+                }
+                
+                String userInput = newVal.toLowerCase();
+
+                if(songDataModel.getName().toLowerCase().indexOf(userInput) != -1) {
+                    return true;
+                    
+                }else if(songDataModel.getArtistName().toLowerCase().indexOf(userInput) != -1) {
+                    return true;
+                    
+                }else if(songDataModel.getAlbumName().toLowerCase().indexOf(userInput) != -1) {
+                    return true;
+                    
+                }else if(String.valueOf(songDataModel.getSongID()).indexOf(userInput) != -1) {
+                    return true;
+                    
+                } else {
+                    return false;
+                }
+
+            });
+
+        });
+
+        SortedList<SongDataModel> sortedList = new SortedList<>(filteredList);
         
-        Image pause = new Image("D:\\UniWork\\Third Year\\Major Project\\MajorProject\\src\\main\\resources\\uk\\aber\\ac\\keg21\\musicapp\\Icons\\Pause.png");
-        Image play = new Image("D:\\UniWork\\Third Year\\Major Project\\MajorProject\\src\\main\\resources\\uk\\aber\\ac\\keg21\\musicapp\\Icons\\Play.png");
+        sortedList.comparatorProperty().bind(tableView.comparatorProperty());
+        
+        tableView.setItems(sortedList);
         
         //Setting the on action event handler for the Play/Pause Button
         playButton.setOnAction(e -> {
@@ -178,27 +218,24 @@ public class MainController implements Initializable {
         
         if (!isPlaying) {
             
-//            if(time != new Duration(0.0)) {
-//                player1.setStartTime(time);
-//                player1.play();
-//                System.out.println(player1.startTimeProperty());
-//                time = new Duration(0.0);
-//            } else {
-//                player1.play();
-//            }
-            
             if(time == new Duration(0.0)) {
                 player1.play();
-            } else {
+                isPaused = false;
+            } else if(path != previousSong) {
+                player1.setStartTime(new Duration(0.0));
+                player1.play();
+                isPaused = false;
+            }else if(isPaused && time != new Duration(0.0)) {
                 player1.setStartTime(time);
                 player1.play();
-                
+                isPaused = false;
             }
             
             changeVolume();
             songDuration(selected.getDuration());
             
             isPlaying = true;
+            previousSong = path;
         }
         
     }
@@ -225,6 +262,7 @@ public class MainController implements Initializable {
         //Pause player and set playing to false
         player1.pause();
         isPlaying = false;
+        isPaused = true;
         
         
     }

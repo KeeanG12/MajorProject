@@ -11,6 +11,7 @@ public class SongDataModel {
     public SimpleStringProperty artistName = new SimpleStringProperty();
     public SimpleStringProperty duration = new SimpleStringProperty();
     public SimpleStringProperty filepath = new SimpleStringProperty();
+    
 
     public int getSongID() {
         return songID.get();
