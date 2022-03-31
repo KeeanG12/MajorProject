@@ -20,9 +20,18 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.TagException;
+import org.jaudiotagger.tag.images.Artwork;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.*;
@@ -58,7 +67,6 @@ public class MainController implements Initializable {
 
     @FXML
     private MediaPlayer player1;
-    private MediaPlayer player2;
     
     @FXML
     public Slider timeSlider;
@@ -88,9 +96,15 @@ public class MainController implements Initializable {
     @FXML
     public TextField searchField;
     
+    @FXML
+    public ImageView albumArt;
+    
 
     Image pause = new Image("D:\\UniWork\\Third Year\\Major Project\\MajorProject\\src\\main\\resources\\uk\\aber\\ac\\keg21\\musicapp\\Icons\\Pause.png");
     Image play = new Image("D:\\UniWork\\Third Year\\Major Project\\MajorProject\\src\\main\\resources\\uk\\aber\\ac\\keg21\\musicapp\\Icons\\Play.png");
+    
+
+    Media sound = new Media(new File("src/main/resources/Tunes/Childish Gambino/Because The Internet/Death By Numbers.mp3").toURI().toString());
     
     private boolean isPlaying = false;
     private boolean isPaused = false;
@@ -110,6 +124,8 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        player1 = new MediaPlayer(sound);
+        
         //Setting the CellValue with the Song class as a Data Model
         colSongID.setCellValueFactory(
                 new PropertyValueFactory<SongDataModel, Integer>("songID")
@@ -134,9 +150,12 @@ public class MainController implements Initializable {
         Database music = Database.getInstance();
         music.fillTable(tableView);
 
+        //Creating a Filtered List with the SongDataModel
         FilteredList<SongDataModel> filteredList = new FilteredList<>(music.songList, b -> true);
 
+        //Adding listener to text field to check for user input
         searchField.textProperty().addListener((observable, oldVal, newVal) -> {
+            //If text is entered set the FilteredList Predicate
             filteredList.setPredicate(songDataModel -> {
 
                 //If there is no changes then display all cells
@@ -144,33 +163,30 @@ public class MainController implements Initializable {
                     return true;
                 }
                 
+                //Ensuring text user has input is all lower case
                 String userInput = newVal.toLowerCase();
 
-                if(songDataModel.getName().toLowerCase().indexOf(userInput) != -1) {
+                //Checking if any of the Songs in the list match the predicate
+                if(songDataModel.getName().toLowerCase().contains(userInput)) {
                     return true;
                     
-                }else if(songDataModel.getArtistName().toLowerCase().indexOf(userInput) != -1) {
+                }else if(songDataModel.getArtistName().toLowerCase().contains(userInput)) {
                     return true;
                     
-                }else if(songDataModel.getAlbumName().toLowerCase().indexOf(userInput) != -1) {
+                }else if(songDataModel.getAlbumName().toLowerCase().contains(userInput)) {
                     return true;
                     
-                }else if(String.valueOf(songDataModel.getSongID()).indexOf(userInput) != -1) {
+                }else if(String.valueOf(songDataModel.getSongID()).contains(userInput)) {
                     return true;
                     
                 } else {
                     return false;
                 }
-
             });
-
         });
-
-        SortedList<SongDataModel> sortedList = new SortedList<>(filteredList);
         
-        sortedList.comparatorProperty().bind(tableView.comparatorProperty());
-        
-        tableView.setItems(sortedList);
+        //Setting displayed items as the sorted list
+        tableView.setItems(filteredList);
         
         //Setting the on action event handler for the Play/Pause Button
         playButton.setOnAction(e -> {
@@ -188,13 +204,23 @@ public class MainController implements Initializable {
                 try {
                     //Call Pause button method and set the graphic to Play
                     pauseButton();
-                    playButton.setGraphic(new ImageView(play));
+                    playButton.setGraphic(new ImageView(play));;
                 } catch (URISyntaxException ex) {
                     ex.printStackTrace();
                 }
             }
 
         });
+        
+        player1.setOnEndOfMedia(() -> {
+            Media nextSong = new Media(new File(findNext()).toURI().toString());
+            player1.stop();
+            
+            player1 = new MediaPlayer(nextSong);
+            
+            player1.play();
+        });
+        
 
     }
     
@@ -212,11 +238,17 @@ public class MainController implements Initializable {
 
         //Uses JavaFX-Media to play a MP3 file when button is clicked
         String path = selected.getFilepath();
+        
+        if(getAlbumArt(path) != null) {
+            albumArt.setImage((Image) getAlbumArt(path));
+        } else {
+            Image album = new Image("D:\\UniWork\\Third Year\\Major Project\\MajorProject\\src\\main\\resources\\uk\\aber\\ac\\keg21\\musicapp\\Icons\\AlbumCover.png");
+            albumArt.setImage(album);
+        }
+        
         currentFile = path;
         Media sound = new Media(new File(path).toURI().toString());
         player1 = new MediaPlayer(sound);
-        
-        if (!isPlaying) {
             
             if(time == new Duration(0.0)) {
                 player1.play();
@@ -236,7 +268,6 @@ public class MainController implements Initializable {
             
             isPlaying = true;
             previousSong = path;
-        }
         
     }
     
@@ -269,7 +300,10 @@ public class MainController implements Initializable {
     
     public void shuffleButton() {
         Database music = Database.getInstance();
-        music.shuffleTable(tableView);
+        if(!isPlaying) {
+            music.shuffleTable(tableView);
+        }
+        
     }
     
     @FXML
@@ -369,7 +403,7 @@ public class MainController implements Initializable {
         
         //While the current time changes set the labels text to current time
         player1.currentTimeProperty().addListener(observable -> {
-
+            
            totalDuration.setText(getTimeFormatted(player1.getCurrentTime()) + " / " + duration);
         });
         
@@ -411,6 +445,28 @@ public class MainController implements Initializable {
         return index;
     }
     
+    public Artwork getAlbumArt(String currentFile) {
+        AudioFile audioFile = null;
+
+        try {
+            audioFile = AudioFileIO.read(new File(currentFile));
+        } catch (CannotReadException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (TagException e) {
+            e.printStackTrace();
+        } catch (ReadOnlyFileException e) {
+            e.printStackTrace();
+        } catch (InvalidAudioFrameException e) {
+            e.printStackTrace();
+        }
+        
+        Tag tag = audioFile.getTag();
+        
+        return tag.getFirstArtwork();
+    }
+    
     
     public String findNext() {
         
@@ -445,18 +501,5 @@ public class MainController implements Initializable {
             }
         }
         return previousFilepath;
-    }
-
-    public void playOnEnd() {
-        
-        if(player1 != null) {
-            player1.setOnEndOfMedia(() -> {
-                Media sound = new Media(new File(findNext()).toURI().toString());
-                player1 = new MediaPlayer(sound);
-                player1.play();
-
-            });
-        }
-        
     }
 }

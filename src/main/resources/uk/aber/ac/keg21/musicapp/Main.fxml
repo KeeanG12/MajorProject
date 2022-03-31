@@ -101,6 +101,7 @@
                         <Insets bottom="50.0" left="20.0" right="20.0" top="50.0" />
                      </padding>
                   </VBox>
+                  <ImageView fx:id="albumArt" fitHeight="100.0" fitWidth="100.0" layoutX="104.0" layoutY="484.0" pickOnBounds="true" preserveRatio="true" />
                </children>
             </Pane>
          </left>
@@ -125,16 +126,20 @@
             <Insets />
          </opaqueInsets>
          <top>
-            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <VBox alignment="CENTER" prefHeight="323.0" prefWidth="1829.0" BorderPane.alignment="CENTER">
                <children>
-                  <ImageView fitHeight="306.0" fitWidth="475.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="298.0" fitWidth="470.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@Icons/KG Logo.png" />
+                        <Image url="@Icons/KG%20Logo.png" />
                      </image>
                   </ImageView>
-                  <TextField fx:id="searchField" prefHeight="25.0" prefWidth="193.0" promptText="Enter Artist, Album or Track..." />
+                  <TextField fx:id="searchField" prefHeight="25.0" prefWidth="200.0" promptText="Enter Artist, Album or Track...">
+                     <VBox.margin>
+                        <Insets bottom="30.0" left="600.0" right="600.0" />
+                     </VBox.margin>
+                  </TextField>
                </children>
-            </HBox>
+            </VBox>
          </top>
       </BorderPane>
    </children>
