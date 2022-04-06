@@ -175,7 +175,7 @@ public class Database {
         songList = FXCollections.observableArrayList();
         
         //Using SQLite Inner Join to Select 3 tables using albumID
-        String select = "SELECT " +
+        String selectAll = "SELECT " +
                 "songID," +
                 "songs.name AS songName," +
                 "artist.name AS artistName," +
@@ -189,7 +189,7 @@ public class Database {
         try(Connection conn = this.connect();
 
             Statement statement = conn.createStatement()) {
-            ResultSet rs = statement.executeQuery(select);
+            ResultSet rs = statement.executeQuery(selectAll);
             //Adding new song to list while ResultSet has next
             while (rs.next()) {
                 SongDataModel s = new SongDataModel();
