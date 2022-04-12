@@ -119,6 +119,8 @@ public class MainController implements Initializable {
 
     private String currentFile;
 
+    PlayerController playerController = new PlayerController();
+
     //Creating a selection model for playing songs
     TableView.TableViewSelectionModel<SongDataModel> selectionModel;
 
@@ -146,8 +148,7 @@ public class MainController implements Initializable {
         colDuration.setCellValueFactory(
                 new PropertyValueFactory<SongDataModel, Integer>("duration")
         );
-
-        Database music = Database.getInstance();
+        
         music.fillTable(tableView);
 
         //Creating a Filtered List with the SongDataModel
@@ -220,6 +221,7 @@ public class MainController implements Initializable {
 
     @FXML
     public void playButton() throws URISyntaxException {
+        
 
         SongDataModel selected = getSelected();
 
@@ -231,12 +233,12 @@ public class MainController implements Initializable {
         //Uses JavaFX-Media to play a MP3 file when button is clicked
         String path = selected.getFilepath();
 
-        if (getAlbumArt(path) != null) {
-            albumArt.setImage((Image) getAlbumArt(path));
-        } else {
-            Image album = new Image("D:\\UniWork\\Third Year\\Major Project\\MajorProject\\src\\main\\resources\\uk\\aber\\ac\\keg21\\musicapp\\Icons\\AlbumCover.png");
-            albumArt.setImage(album);
-        }
+//        if (getAlbumArt(path) != null) {
+//            albumArt.setImage((Image) getAlbumArt(path));
+//        } else {
+//            Image album = new Image("D:\\UniWork\\Third Year\\Major Project\\MajorProject\\src\\main\\resources\\uk\\aber\\ac\\keg21\\musicapp\\Icons\\AlbumCover.png");
+//            albumArt.setImage(album);
+//        }
 
         currentFile = path;
         Media sound = new Media(new File(path).toURI().toString());
@@ -255,8 +257,8 @@ public class MainController implements Initializable {
             isPaused = false;
         }
 
-        changeVolume();
-        songDuration(selected.getDuration());
+        playerController.changeVolume(volumeSlider, player1);
+        playerController.songDuration(selected.getDuration(), player1, timeSlider, totalDuration);
         player1.setOnEndOfMedia(new MediaHandler());
 
 
@@ -315,7 +317,6 @@ public class MainController implements Initializable {
     }
 
     public void shuffleButton() {
-        Database music = Database.getInstance();
         if (!isPlaying) {
             music.shuffleTable(tableView);
         }
@@ -332,7 +333,7 @@ public class MainController implements Initializable {
         player1 = new MediaPlayer(sound);
 
         //Getting the index of current file and selecting that
-        int index = findIndex(currentFile);
+        int index = playerController.findIndex(currentFile);
         selectionModel.select(index);
 
         
@@ -352,7 +353,7 @@ public class MainController implements Initializable {
         player1 = new MediaPlayer(sound);
 
         //Getting the index of current file and selecting that
-        int index = findIndex(currentFile);
+        int index = playerController.findIndex(currentFile);
         selectionModel.select(index);
 
         changeVolume();
@@ -427,24 +428,26 @@ public class MainController implements Initializable {
     }
 
     public void settingButton(ActionEvent actionEvent) throws IOException {
-        if (player1 != null) {
-            player1.stop();
-        }
-        Parent root = FXMLLoader.load(Main.class.getResource("Setting.fxml"));
-        stage = (Stage) settingsButton.getScene().getWindow();
-        stage.setScene(new Scene(root));
-        stage.setFullScreen(true);
+//        if (player1 != null) {
+//            player1.stop();
+//        }
+//        Parent root = FXMLLoader.load(Main.class.getResource("Setting.fxml"));
+//        stage = (Stage) settingsButton.getScene().getWindow();
+//        stage.setScene(new Scene(root));
+//        stage.setFullScreen(true);
+        playerController.settingButton(stage, player1, settingsButton);
 
     }
 
     public void albumButton(ActionEvent actionEvent) throws IOException {
-        if (player1 != null) {
-            player1.stop();
-        }
-        Parent root = FXMLLoader.load(Main.class.getResource("Albums.fxml"));
-        stage = (Stage) albumButton.getScene().getWindow();
-        stage.setScene(new Scene(root));
-        stage.setFullScreen(true);
+//        if (player1 != null) {
+//            player1.stop();
+//        }
+//        Parent root = FXMLLoader.load(Main.class.getResource("Albums.fxml"));
+//        stage = (Stage) albumButton.getScene().getWindow();
+//        stage.setScene(new Scene(root));
+//        stage.setFullScreen(true);
+        playerController.albumButton(stage, player1, albumButton);
 
     }
 
