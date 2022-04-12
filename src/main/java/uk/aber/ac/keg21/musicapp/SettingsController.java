@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -17,11 +18,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class SettingsController implements Initializable {
+public class SettingsController{
 
     private Stage stage;
     
     public File library;
+    
+    private MediaPlayer player1;
     
     @FXML
     public Button songsButton;
@@ -33,15 +36,19 @@ public class SettingsController implements Initializable {
     public Button browseButton;
     
     @FXML
+    public Button albumButton;
+    
+    @FXML
     public Button scanButton;
     
+    PlayerController playerController = new PlayerController();
+    
     public void songButton(ActionEvent actionEvent) throws IOException {
-        
-        Parent root = FXMLLoader.load(Main.class.getResource("Main.fxml"));
-        stage = (Stage) songsButton.getScene().getWindow();
-        stage.setScene(new Scene(root));
-        stage.setFullScreen(true);
-        
+        playerController.songButton(stage, player1, songsButton);
+    }
+    
+    public void albumButton(ActionEvent actionEvent) throws IOException {
+        playerController.albumButton(stage, player1, albumButton);
     }
     
     public void browseButton(ActionEvent actionEvent) {
@@ -58,11 +65,6 @@ public class SettingsController implements Initializable {
         Database music = Database.getInstance();
         music.delete();
         music.rescan(library);
-        
-    }
-    
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
         
     }
 }

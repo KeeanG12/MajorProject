@@ -169,6 +169,8 @@ public class Database {
 
     public ObservableList<SongDataModel> songList;
 
+    public ObservableList<SongDataModel> currentList;
+
     public SongDataModel song = new SongDataModel();
     
     public void fillTable(TableView tableView) {

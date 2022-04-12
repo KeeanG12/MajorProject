@@ -80,7 +80,7 @@
          <left>
             <Pane prefHeight="502.0" prefWidth="352.0" BorderPane.alignment="CENTER">
                <children>
-                  <VBox alignment="CENTER" layoutY="21.0" prefHeight="426.0" prefWidth="194.0" spacing="20.0" styleClass="menu-bar" stylesheets="@styles.css">
+                  <VBox alignment="CENTER" layoutY="125.0" prefHeight="426.0" prefWidth="194.0" spacing="20.0" styleClass="menu-bar" stylesheets="@styles.css">
                      <opaqueInsets>
                         <Insets />
                      </opaqueInsets>
@@ -93,7 +93,7 @@
                            <font>
                               <Font size="18.0" />
                            </font></Button>
-                        <Button fx:id="settingsButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="76.0" prefWidth="199.0" styleClass="settings-button" stylesheets="@styles.css" text="Settings">
+                        <Button fx:id="settingsButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#settingsButton" prefHeight="76.0" prefWidth="199.0" styleClass="settings-button" stylesheets="@styles.css" text="Settings">
                            <font>
                               <Font size="18.0" />
                            </font></Button>

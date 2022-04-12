@@ -2,129 +2,30 @@ package uk.aber.ac.keg21.musicapp;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.TagException;
-import org.jaudiotagger.tag.images.Artwork;
-
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+
 
 public class PlayerController {
 
-    private Stage stage;
-
-    @FXML
-    public TableView tableView;
-
-    @FXML
-    private TableColumn colSongID;
-
-    @FXML
-    private TableColumn colTitle;
-
-    @FXML
-    private TableColumn colArtistName;
-
-    @FXML
-    private TableColumn colAlbumName;
-
-    @FXML
-    private TableColumn colDuration;
-
-    @FXML
-    private Button playButton;
-
-    @FXML
-    private Label currentSong;
-
-    @FXML
-    private MediaPlayer player1;
-
-//    @FXML
-//    public Slider timeSlider;
-//
-//    @FXML
-//    public Label totalDuration;
-//
-//    @FXML
-//    public Slider volumeSlider;
-
-    @FXML
-    public Button nextButton;
-
-    @FXML
-    public Button previousButton;
-
-
-    @FXML
-    public Button settingsButton;
-
-    @FXML
-    public Button albumButton;
-
-    @FXML
-    public Button shuffleButton;
-
-    @FXML
-    public TextField searchField;
-
-    @FXML
-    public ImageView albumArt;
-
-    Image pause = new Image("D:\\UniWork\\Third Year\\Major Project\\MajorProject\\src\\main\\resources\\uk\\aber\\ac\\keg21\\musicapp\\Icons\\Pause.png");
-    Image play = new Image("D:\\UniWork\\Third Year\\Major Project\\MajorProject\\src\\main\\resources\\uk\\aber\\ac\\keg21\\musicapp\\Icons\\Play.png");
-
-
-    Media sound = new Media(new File("src/main/resources/Tunes/Childish Gambino/Because The Internet/Death By Numbers.mp3").toURI().toString());
-
-    private boolean isPlaying = false;
-    private boolean isPaused = false;
-    private boolean isEnd;
-    private String previousSong = "";
-
-    private double volume = 1.0;
-
-    Duration time = new Duration(0.0);
-
     Database music = Database.getInstance();
+    
+    Double volume = 1.0;
 
-    private String currentFile;
-
-    //Creating a selection model for playing songs
-    TableView.TableViewSelectionModel<SongDataModel> selectionModel;
-
-
-    public SongDataModel getSelected(TableView tableView) {
-        //Getting the selection model to know which cell the user selects
-        selectionModel = tableView.getSelectionModel();
-
-        //Setting selection mode to single, so they can only select a single cell
-        selectionModel.setSelectionMode(SelectionMode.SINGLE);
-        SongDataModel selected = selectionModel.getSelectedItem();
-
-        return selected;
-    }
+    Image pauseIcon = new Image("D:\\UniWork\\Third Year\\Major Project\\MajorProject\\src\\main\\resources\\uk\\aber\\ac\\keg21\\musicapp\\Icons\\Pause.png");
+    Image playIcon = new Image("D:\\UniWork\\Third Year\\Major Project\\MajorProject\\src\\main\\resources\\uk\\aber\\ac\\keg21\\musicapp\\Icons\\Play.png");
+    
+    
 
 
     public String getTimeFormatted(Duration currentTime) {
@@ -149,12 +50,14 @@ public class PlayerController {
     }
 
 
-    public void changeVolume(Slider volumeSlider, MediaPlayer player1) {
+    public void changeVolume(Slider volumeSlider, MediaPlayer player1, Double volume) {
         //Setting slider value to current player volume * 100 as the volume range is 0.0 - 1.0
         volumeSlider.setValue(player1.getVolume() * 100);
 
         //Setting the volume to slider value / 100 if the slider value changes
         volumeSlider.valueProperty().addListener(observable -> player1.setVolume(volumeSlider.getValue() / 100));
+        
+        volume = volumeSlider.getValue() / 100;
 
     }
 
@@ -190,6 +93,17 @@ public class PlayerController {
 
     }
 
+    public void songButton(Stage stage, MediaPlayer player1, Button songsButton) throws IOException {
+        if (player1 != null) {
+            player1.stop();
+        }
+        Parent root = FXMLLoader.load(Main.class.getResource("Main.fxml"));
+        stage = (Stage) songsButton.getScene().getWindow();
+        stage.setScene(new Scene(root));
+        stage.setFullScreen(true);
+
+    }
+
     public void settingButton(Stage stage, MediaPlayer player1, Button settingsButton) throws IOException {
         if (player1 != null) {
             player1.stop();
@@ -212,85 +126,166 @@ public class PlayerController {
 
     }
 
-    private Connection connect() {
-        // SQLite connection string
-        String db = "jdbc:sqlite:music.db";
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection(db);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return conn;
-    }
-
     public int findIndex(String currentFile) {
         int index = 0;
 
 
-        for (SongDataModel song : music.songList) {
-            if (song.getFilepath() == currentFile) {
-                index = music.songList.indexOf(song);
+        if(music.currentList.isEmpty()) {
+            for (SongDataModel song : music.songList) {
+                if (song.getFilepath() == currentFile) {
+                    index = music.songList.indexOf(song);
+                }
+            }
+        } else {
+            for(SongDataModel song : music.currentList) {
+                if(song.getFilepath() == currentFile) {
+                    index = music.currentList.indexOf(song);
+                }
             }
         }
         return index;
     }
 
-    public Artwork getAlbumArt(String currentFile) {
-        AudioFile audioFile = null;
 
-        try {
-            audioFile = AudioFileIO.read(new File(currentFile));
-        } catch (CannotReadException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (TagException e) {
-            e.printStackTrace();
-        } catch (ReadOnlyFileException e) {
-            e.printStackTrace();
-        } catch (InvalidAudioFrameException e) {
-            e.printStackTrace();
-        }
-
-        Tag tag = audioFile.getTag();
-
-        return tag.getFirstArtwork();
-    }
-
-
-    public String findNext(String currentFile) {
+    public String findNext(String currentFile, Label currentSong) {
 
 
         String nextFilepath = "";
         Boolean found = false;
         SongDataModel nextSong = new SongDataModel();
 
+        if(music.currentList.isEmpty()) {
         for (SongDataModel song : music.songList) {
             if (song.getFilepath() == currentFile) {
-                nextSong = music.songList.get(music.songList.indexOf(song) + 1);
-                nextFilepath = nextSong.getFilepath();
-                currentSong.setText(nextSong.getArtistName() + " - " + nextSong.getName());
-                System.out.println(nextFilepath);
+                if(music.songList.indexOf(song) + 1 != music.songList.size()) {
+                    nextSong = music.songList.get(music.songList.indexOf(song) + 1);
+                    nextFilepath = nextSong.getFilepath();
+                    currentSong.setText(nextSong.getArtistName() + " - " + nextSong.getName());
+                    System.out.println(nextFilepath);
+                } else {
+                    nextSong = music.songList.get(0);
+                    nextFilepath = nextSong.getFilepath();
+                    currentSong.setText(nextSong.getArtistName() + "-" + nextSong.getName());
+                }
+            }
+        }
+        } else {
+            for (SongDataModel song : music.currentList) {
+                if (song.getFilepath() == currentFile) {
+                    if (music.currentList.indexOf(song) + 1 != music.currentList.size()) {
+                        nextSong = music.currentList.get(music.currentList.indexOf(song) + 1);
+                        nextFilepath = nextSong.getFilepath();
+                        currentSong.setText(nextSong.getArtistName() + " - " + nextSong.getName());
+                        System.out.println(nextFilepath);
+                    } else {
+                        nextSong = music.currentList.get(0);
+                        nextFilepath = nextSong.getFilepath();
+                        currentSong.setText(nextSong.getArtistName() + "-" + nextSong.getName());
+                    }
+                }
             }
         }
         return nextFilepath;
     }
 
-    public String findPrevious(String currentFile) {
+    public String findPrevious(String currentFile, Label currentSong) {
 
         String previousFilepath = "";
         Boolean found = false;
         SongDataModel previousSong = new SongDataModel();
 
-        for (SongDataModel song : music.songList) {
-            if (song.getFilepath() == currentFile) {
-                previousSong = music.songList.get(music.songList.indexOf(song) - 1);
-                previousFilepath = previousSong.getFilepath();
-                currentSong.setText(previousSong.getArtistName() + " - " + previousSong.getName());
-                System.out.println(previousFilepath);
+        if(music.currentList.isEmpty()) {
+            for (SongDataModel song : music.songList) {
+                if (song.getFilepath() == currentFile) {
+                    if (song != music.songList.get(0)) {
+                        previousSong = music.songList.get(music.songList.indexOf(song) - 1);
+                        previousFilepath = previousSong.getFilepath();
+                        currentSong.setText(previousSong.getArtistName() + " - " + previousSong.getName());
+                        System.out.println(previousFilepath);
+                    } else {
+                        previousSong = music.songList.get(music.songList.size() - 1);
+                        previousFilepath = previousSong.getFilepath();
+                        currentSong.setText(previousSong.getArtistName() + "-" + previousSong.getName());
+                    }
+                }
+            }
+        } else {
+            for (SongDataModel song : music.currentList) {
+                if (song.getFilepath() == currentFile) {
+                    if (song != music.currentList.get(0)) {
+                        previousSong = music.currentList.get(music.currentList.indexOf(song) - 1);
+                        previousFilepath = previousSong.getFilepath();
+                        currentSong.setText(previousSong.getArtistName() + " - " + previousSong.getName());
+                        System.out.println(previousFilepath);
+                    } else {
+                        previousSong = music.currentList.get(music.currentList.size() - 1);
+                        previousFilepath = previousSong.getFilepath();
+                        currentSong.setText(previousSong.getArtistName() + "-" + previousSong.getName());
+                    }
+                }
             }
         }
         return previousFilepath;
+    }
+    
+    public void initializeSongs(TableView tableView, TextField searchField) {
+        
+        music.fillTable(tableView);
+
+        //Creating a Filtered List with the SongDataModel
+        FilteredList<SongDataModel> filteredList = new FilteredList<>(music.songList, b -> true);
+
+        //Adding listener to text field to check for user input
+        searchField.textProperty().addListener((observable, oldVal, newVal) -> {
+            //If text is entered set the FilteredList Predicate
+            filteredList.setPredicate(songDataModel -> {
+
+                //If there is no changes then display all cells
+                if (newVal == null || newVal.isBlank() || newVal.isEmpty()) {
+                    return true;
+                }
+
+                //Ensuring text user has input is all lower case
+                String userInput = newVal.toLowerCase();
+
+                //Checking if any of the Songs in the list match the predicate
+                if (songDataModel.getName().toLowerCase().contains(userInput)) {
+                    return true;
+
+                } else if (songDataModel.getArtistName().toLowerCase().contains(userInput)) {
+                    return true;
+
+                } else if (songDataModel.getAlbumName().toLowerCase().contains(userInput)) {
+                    return true;
+
+                } else if (String.valueOf(songDataModel.getSongID()).contains(userInput)) {
+                    return true;
+
+                } else {
+                    return false;
+                }
+            });
+        });
+
+        //Setting displayed items as the sorted list
+        music.currentList = filteredList;
+        tableView.setItems(music.currentList);
+    }
+    
+    public void initializeAlbums(ChoiceBox choiceBox, String previous, TableView tableView, String selected) {
+        for (int i = 0; i < music.songList.size() - 1; i++) {
+            String current = music.songList.get(i).getAlbumName();
+
+            if (choiceBox.getItems().contains(previous)) {
+//                System.out.println("Already Exists");
+            } else {
+                choiceBox.getItems().add(current);
+            }
+            previous = music.songList.get(i).getAlbumName();
+        }
+
+        music.fillTable(tableView);
+
+        selected = (String) choiceBox.getSelectionModel().getSelectedItem();
     }
 }
