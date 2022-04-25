@@ -88,10 +88,15 @@
                            <font>
                               <Font size="18.0" />
                            </font></Button>
-                        <Button fx:id="albumButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#albumButton" styleClass="playlist-button" stylesheets="@styles.css" text="Album">
+                        <Button fx:id="albumButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#albumButton" styleClass="album-button" stylesheets="@styles.css" text="Album">
                            <font>
                               <Font size="18.0" />
                            </font></Button>
+                        <Button fx:id="artistButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#artistButton" styleClass="artist-button" stylesheets="@styles.css" text="Artist">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Button>
                         <Button fx:id="settingsButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#settingButton" styleClass="settings-button" stylesheets="@styles.css" text="Settings">
                            <font>
                               <Font size="18.0" />
@@ -113,6 +118,7 @@
                   <TableColumn fx:id="colArtistName" prefWidth="245.0" text="Artist" />
                   <TableColumn fx:id="colAlbumName" prefWidth="259.0" text="Album" />
                   <TableColumn fx:id="colDuration" prefWidth="74.0" text="Duration" />
+                  <TableColumn fx:id="colProduced" prefWidth="74.0" text="Produced" />
               </columns>
                <columnResizePolicy>
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

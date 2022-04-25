@@ -182,6 +182,7 @@ public class Database {
                 "songs.name AS songName," +
                 "artist.name AS artistName," +
                 "album.name AS albumName, " +
+                "album.produced AS produced ," +
                 "songs.duration as duration, " +
                 "songs.filepath AS filepath " +
                 "FROM songs " +
@@ -202,6 +203,7 @@ public class Database {
 //                s.setAlbumID(rs.getInt("albumID"));
                 s.setAlbumName(rs.getString("albumName"));
                 s.setDuration(rs.getString("duration"));
+                s.setProduced(rs.getInt("produced"));
                 s.setFilepath(rs.getString("filepath"));
                 songList.add(s);
             }
@@ -281,62 +283,12 @@ public class Database {
                 //Setting the MP3 file to AudioFile.read of the current file being parsed in
                 try {
                     f = (MP3File) AudioFileIO.read(new File(file.getAbsolutePath()));
-                } catch (CannotReadException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (TagException e) {
-                    e.printStackTrace();
-                } catch (ReadOnlyFileException e) {
-                    e.printStackTrace();
-                } catch (InvalidAudioFrameException e) {
+                } catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
                     e.printStackTrace();
                 }
-                
-                //Creating a tag variable to get the tag data of the MP3 AudioFile
-                Tag tag = f.getTag();
-                MP3AudioHeader audioHeader = f.getMP3AudioHeader();
-                AbstractID3v2Tag v2tag  = f.getID3v2Tag();
-                
-                
-                //Retrieving everything before " Feat." in the artist name using .split
-                String artistTag = v2tag.getFirst(ID3v24Frames.FRAME_ID_ARTIST);
-                String parts[] = artistTag.split(" Feat. ");
-                
-                //Declaring current artist, album and song
-                String artist = parts[0];
-                String album = v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM);
-                String song = v2tag.getFirst(ID3v24Frames.FRAME_ID_TITLE);
-                
-                int artistID = getID(artist, "artist", "artistID");
-                int albumID = getID(album, "album", "artistID");
-                
-                
-                
-                //Checks if current artist already exists in database and gets the ID if true
-                if(checkExists(artist, "artist", "artistID")) {
-                    artistID = getID(artist, "artist", "artistID");
-                //Adds the current artist if they don't exist in the database    
-                } else {
-                    insertArtist(artist);
-                    artistID = getID(artist, "artist", "artistID");
-                }
-                //Checks if current album already exists in database and gets the ID if true
-                if(checkExists(album, "album", "albumID")) {
-                    albumID = getID(album, "album", "albumID");
-                    System.out.println(albumID);
-                //Adds current album if it doesn't exist in the database    
-                } else {
-                    insertAlbum(artistID, album, Integer.parseInt(v2tag.getFirst(FieldKey.YEAR)));
-                    albumID = getID(album, "album", "albumID");
-                }
-                //Adds current song
-                String filepath = file.getAbsolutePath();
-                insertSong(albumID, song, artistID, (audioHeader.getTrackLengthAsString()), filepath);
-                
-                //Adding 1 to each ID
+                scanMetadataTags(f, file);
+                //Adding one to the number of files scanned
                 numFiles++;
-                
                 
                 } else {
                 numDirectories++;
@@ -344,10 +296,50 @@ public class Database {
                 File[] files = file.listFiles();
                 
                 //For each file call rescan on that file
-                for (File otherFile : files) {
-                    rescan(otherFile);
+                for (File nextFile : files) {
+                    rescan(nextFile);
                 }
             }
+        }
+        
+        public void scanMetadataTags(MP3File f, File file) {
+            //Creating a tag variable to get the tag data of the MP3 AudioFile
+            Tag tag = f.getTag();
+            MP3AudioHeader audioHeader = f.getMP3AudioHeader();
+            AbstractID3v2Tag v2tag  = f.getID3v2Tag();
+
+
+            //Retrieving everything before " Feat." in the artist name using .split
+            String artistTag = v2tag.getFirst(ID3v24Frames.FRAME_ID_ARTIST);
+            String parts[] = artistTag.split(" Feat. ");
+
+            //Declaring current artist, album and song
+            String artist = parts[0];
+            String album = v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM);
+            String song = v2tag.getFirst(ID3v24Frames.FRAME_ID_TITLE);
+
+            int artistID = getID(artist, "artist", "artistID");
+            int albumID = getID(album, "album", "artistID");
+
+
+
+            //Checks if current artist already exists in database and gets the ID if true
+            if(checkExists(artist, "artist", "artistID")) {
+                //Adds the current artist if they don't exist in the database    
+            } else {
+                insertArtist(artist);
+            }
+            artistID = getID(artist, "artist", "artistID");
+            //Checks if current album already exists in database and gets the ID if true
+            if(checkExists(album, "album", "albumID")) {
+                //Adds current album if it doesn't exist in the database    
+            } else {
+                insertAlbum(artistID, album, Integer.parseInt(v2tag.getFirst(FieldKey.YEAR)));
+            }
+            albumID = getID(album, "album", "albumID");
+            //Adds current song
+            String filepath = file.getAbsolutePath();
+            insertSong(albumID, song, artistID, (audioHeader.getTrackLengthAsString()), filepath);
         }
         
         

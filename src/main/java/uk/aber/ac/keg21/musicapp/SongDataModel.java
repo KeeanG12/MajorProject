@@ -11,7 +11,8 @@ public class SongDataModel {
     public SimpleStringProperty artistName = new SimpleStringProperty();
     public SimpleStringProperty duration = new SimpleStringProperty();
     public SimpleStringProperty filepath = new SimpleStringProperty();
-    
+    public SimpleIntegerProperty produced = new SimpleIntegerProperty();
+
 
     public int getSongID() {
         return songID.get();
@@ -36,30 +37,6 @@ public class SongDataModel {
     public void setName(String name) {
         this.name.set(name);
     }
-
-    public int getAlbumID() {
-        return albumID.get();
-    }
-
-    public SimpleIntegerProperty albumIDProperty() {
-        return albumID;
-    }
-
-    public void setAlbumID(int albumID) {
-        this.albumID.set(albumID);
-    }
-//
-//    public int getArtistID() {
-//        return artistID.get();
-//    }
-//
-//    public SimpleIntegerProperty artistIDProperty() {
-//        return artistID;
-//    }
-//
-//    public void setArtistID(int artistID) {
-//        this.artistID.set(artistID);
-//    }
 
     public String getDuration() {
         return duration.get();
@@ -87,6 +64,18 @@ public class SongDataModel {
 
     public String getArtistName() {
         return artistName.get();
+    }
+
+    public int getProduced() {
+        return produced.get();
+    }
+
+    public SimpleIntegerProperty producedProperty() {
+        return produced;
+    }
+
+    public void setProduced(int produced) {
+        this.produced.set(produced);
     }
 
     public SimpleStringProperty artistNameProperty() {

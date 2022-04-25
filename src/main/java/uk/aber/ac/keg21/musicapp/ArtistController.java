@@ -2,15 +2,10 @@ package uk.aber.ac.keg21.musicapp;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
@@ -25,8 +20,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class AlbumController implements Initializable {
-
+public class ArtistController implements Initializable {
     @FXML
     public ChoiceBox choiceBox;
 
@@ -35,13 +29,13 @@ public class AlbumController implements Initializable {
 
     @FXML
     public Button songsButton;
-    
+
     @FXML
     public Button settingsButton;
-    
+
     @FXML
     public Button playButton;
-    
+
     @FXML
     public Button pauseButton;
 
@@ -62,27 +56,27 @@ public class AlbumController implements Initializable {
 
     @FXML
     private TableColumn colDuration;
-    
+
     @FXML
     private TableColumn colProduced;
 
     @FXML
     private MediaPlayer player1;
-    
+
     @FXML
     public Label currentSong;
-    
+
     @FXML
     public Slider volumeSlider;
-    
+
     @FXML
     public Label totalDuration;
-    
+
     @FXML
     public Slider timeSlider;
 
     public String currentFile;
-    
+
     public Duration time = new Duration(0.0);
 
     private boolean isPlaying = false;
@@ -90,7 +84,7 @@ public class AlbumController implements Initializable {
     private String previousSong = "";
 
     private double volume = 1.0;
-    
+
     TableView.TableViewSelectionModel<SongDataModel> selectionModel;
 
     String previous;
@@ -98,7 +92,7 @@ public class AlbumController implements Initializable {
     Database music = Database.getInstance();
 
     String selected;
-    
+
     PlayerController playerController = new PlayerController();
 
 
@@ -125,13 +119,13 @@ public class AlbumController implements Initializable {
         colDuration.setCellValueFactory(
                 new PropertyValueFactory<SongDataModel, Integer>("duration")
         );
-        
+
         colProduced.setCellValueFactory(
                 new  PropertyValueFactory<SongDataModel, Integer>("produced")
         );
 
-        playerController.initializeAlbums(choiceBox, previous, tableView, selected);
-        
+        playerController.initializeArtist(choiceBox, previous, tableView, selected);
+
         changeTable();
     }
 
@@ -152,8 +146,8 @@ public class AlbumController implements Initializable {
                     }
 
                     String userSelection = newVal.toLowerCase();
-                     
-                    if (songDataModel.getAlbumName().toLowerCase().contains(userSelection)) {
+
+                    if (songDataModel.getArtistName().toLowerCase().contains(userSelection)) {
                         return true;
                     }
 
@@ -200,7 +194,7 @@ public class AlbumController implements Initializable {
         //Finding the directory path from the selected cell data
         String artist = selected.getArtistName();
         currentSong.setText(artist + " - " + selected.getName());
-        
+
         //Uses JavaFX-Media to play a MP3 file when button is clicked
         String path = selected.getFilepath();
 
@@ -298,8 +292,9 @@ public class AlbumController implements Initializable {
         playerController.songButton(stage, player1, songsButton);
 
     }
-    
+
     public void settingsButton(ActionEvent actionEvent) throws IOException {
         playerController.settingButton(stage, player1, settingsButton);
     }
 }
+

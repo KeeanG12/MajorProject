@@ -58,6 +58,9 @@ public class MainController implements Initializable {
 
     @FXML
     private TableColumn colDuration;
+    
+    @FXML
+    private TableColumn colProduced;
 
     @FXML
     private Button playButton;
@@ -82,6 +85,9 @@ public class MainController implements Initializable {
 
     @FXML
     public Button previousButton;
+    
+    @FXML
+    public Button artistButton;
 
 
     @FXML
@@ -143,6 +149,10 @@ public class MainController implements Initializable {
 
         colDuration.setCellValueFactory(
                 new PropertyValueFactory<SongDataModel, Integer>("duration")
+        );
+        
+        colProduced.setCellValueFactory(
+                new PropertyValueFactory<SongDataModel, Integer>("produced")
         );
         
         playerController.initializeSongs(tableView, searchField);
@@ -323,6 +333,11 @@ public class MainController implements Initializable {
 
     public void albumButton(ActionEvent actionEvent) throws IOException {
         playerController.albumButton(stage, player1, albumButton);
+
+    }
+
+    public void artistButton(ActionEvent actionEvent) throws IOException {
+        playerController.artistButton(stage, player1, artistButton);
 
     }
 }

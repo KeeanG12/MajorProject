@@ -66,8 +66,14 @@
     -fx-background-color: rgba(0,0,0,0);
 }
 
-.playlist-button{
+.album-button{
     -fx-graphic: url(Icons/Album.png);
+    -fx-content-display: left;
+    -fx-background-color: rgba(0,0,0,0);
+}
+
+.artist-button{
+    -fx-graphic: url(Icons/Artist.png);
     -fx-content-display: left;
     -fx-background-color: rgba(0,0,0,0);
 }
@@ -102,8 +108,14 @@
     -fx-background-color: #43cea2;
 }
 
-.playlist-button-clicked{
+.album-button-clicked{
     -fx-graphic: url(Icons/Album.png);
+    -fx-content-display: left;
+    -fx-background-color: #43cea2;
+}
+
+.artist-button-clicked{
+    -fx-graphic: url(Icons/Artist.png);
     -fx-content-display: left;
     -fx-background-color: #43cea2;
 }

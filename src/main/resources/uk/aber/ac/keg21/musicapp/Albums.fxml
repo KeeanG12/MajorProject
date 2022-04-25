@@ -37,13 +37,13 @@
                   <Insets right="150.0" />
                </HBox.margin>
             </HBox>
-            <Button fx:id="previousButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="72.0" prefWidth="40.0" styleClass="previous-button" stylesheets="@styles.css" text="Previous" />
+            <Button fx:id="previousButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#previousButton" prefHeight="72.0" prefWidth="40.0" styleClass="previous-button" stylesheets="@styles.css" text="Previous" />
             <Button fx:id="playButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="64.0" prefWidth="67.0" styleClass="play-button" stylesheets="@styles.css" text="Play">
                <HBox.margin>
                   <Insets />
                </HBox.margin>
             </Button>
-            <Button fx:id="nextButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="35.0" prefWidth="40.0" styleClass="next-button" stylesheets="@styles.css" text="Next" />
+            <Button fx:id="nextButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#nextButton" prefHeight="35.0" prefWidth="40.0" styleClass="next-button" stylesheets="@styles.css" text="Next" />
             <VBox alignment="CENTER" prefHeight="91.0" prefWidth="844.0">
                <children>
                   <Label fx:id="currentSong" text="Now Playing: Song Name">
@@ -89,10 +89,15 @@
                            <font>
                               <Font size="18.0" />
                            </font></Button>
-                        <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="76.0" prefWidth="160.0" styleClass="playlist-button-clicked" stylesheets="@styles.css" text="Albums">
+                        <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="76.0" prefWidth="160.0" styleClass="album-button-clicked" stylesheets="@styles.css" text="Albums">
                            <font>
                               <Font size="18.0" />
                            </font></Button>
+                        <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="76.0" prefWidth="160.0" styleClass="artist-button" stylesheets="@styles.css" text="Artist">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Button>
                         <Button fx:id="settingsButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#settingsButton" prefHeight="76.0" prefWidth="199.0" styleClass="settings-button" stylesheets="@styles.css" text="Settings">
                            <font>
                               <Font size="18.0" />
@@ -135,6 +140,7 @@
                         <TableColumn fx:id="colArtistName" prefWidth="245.0" text="Artist" />
                         <TableColumn fx:id="colAlbumName" prefWidth="259.0" text="Album" />
                         <TableColumn fx:id="colDuration" prefWidth="74.0" text="Duration" />
+                        <TableColumn fx:id="colProduced" prefWidth="74.0" text="Produced" />
                      </columns>
                      <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
