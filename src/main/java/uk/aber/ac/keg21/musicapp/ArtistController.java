@@ -64,6 +64,9 @@ public class ArtistController implements Initializable {
     private MediaPlayer player1;
 
     @FXML
+    public Button albumButton;
+
+    @FXML
     public Label currentSong;
 
     @FXML
@@ -121,11 +124,25 @@ public class ArtistController implements Initializable {
         );
 
         colProduced.setCellValueFactory(
-                new  PropertyValueFactory<SongDataModel, Integer>("produced")
+                new PropertyValueFactory<SongDataModel, Integer>("produced")
         );
 
-        playerController.initializeArtist(choiceBox, previous, tableView, selected);
+        for (int i = 0; i < music.songList.size() - 1; i++) {
+            String current = music.songList.get(i).getArtistName();
 
+            if (choiceBox.getItems().contains(previous)) {
+//                System.out.println("Already Exists");
+            } else {
+                choiceBox.getItems().add(current);
+            }
+            previous = music.songList.get(i).getArtistName();
+        }
+
+        music.fillTable(tableView);
+
+        selected = (String) choiceBox.getSelectionModel().getSelectedItem();
+
+    
         changeTable();
     }
 
@@ -215,7 +232,7 @@ public class ArtistController implements Initializable {
             isPaused = false;
         }
 
-        playerController.changeVolume(volumeSlider, player1, volume);
+        playerController.changeVolume(volumeSlider, player1);
         playerController.songDuration(selected.getDuration(), player1, timeSlider, totalDuration);
 //        player1.setOnEndOfMedia(new MainController.MediaHandler());
 
@@ -280,7 +297,7 @@ public class ArtistController implements Initializable {
         int index = playerController.findIndex(currentFile);
         selectionModel.select(index);
 
-        playerController.changeVolume(volumeSlider, player1, volume);
+        playerController.changeVolume(volumeSlider, player1);
         playerController.songDuration(getSelected().getDuration(), player1, timeSlider, totalDuration);
 
 
@@ -290,6 +307,11 @@ public class ArtistController implements Initializable {
 
     public void songButton(ActionEvent actionEvent) throws IOException {
         playerController.songButton(stage, player1, songsButton);
+
+    }
+
+    public void albumButton(ActionEvent actionEvent) throws IOException {
+        playerController.albumButton(stage, player1, albumButton);
 
     }
 

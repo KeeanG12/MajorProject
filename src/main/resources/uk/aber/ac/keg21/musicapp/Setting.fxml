@@ -17,7 +17,7 @@
          <left>
             <Pane prefHeight="502.0" prefWidth="352.0" BorderPane.alignment="CENTER">
                <children>
-                  <VBox alignment="CENTER" layoutY="208.0" prefHeight="426.0" prefWidth="194.0" spacing="20.0" styleClass="menu-bar" stylesheets="@styles.css">
+                  <VBox alignment="CENTER" layoutY="146.0" prefHeight="554.0" prefWidth="200.0" spacing="50.0" styleClass="menu-bar" stylesheets="@styles.css">
                      <opaqueInsets>
                         <Insets />
                      </opaqueInsets>
@@ -26,15 +26,23 @@
                            <font>
                               <Font size="18.0" />
                            </font></Button>
-                        <Button fx:id="albumButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#albumButton" prefHeight="76.0" prefWidth="160.0" styleClass="playlist-button" stylesheets="@styles.css" text="Albums">
+                        <Button fx:id="albumButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#albumButton" prefHeight="76.0" prefWidth="160.0" styleClass="album-button" stylesheets="@styles.css" text="Album">
                            <font>
                               <Font size="18.0" />
                            </font></Button>
+                        <Button fx:id="artistButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#artistButton" prefHeight="76.0" prefWidth="160.0" styleClass="artist-button" stylesheets="@styles.css" text="Artist">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Button>
                         <Button fx:id="settingsButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="76.0" prefWidth="199.0" styleClass="setting-button-clicked" stylesheets="@styles.css" text="Settings">
                            <font>
                               <Font size="18.0" />
                            </font></Button>
                      </children>
+                     <padding>
+                        <Insets bottom="50.0" left="20.0" right="20.0" top="50.0" />
+                     </padding>
                   </VBox>
                </children>
             </Pane>

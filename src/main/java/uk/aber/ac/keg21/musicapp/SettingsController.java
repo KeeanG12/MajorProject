@@ -41,6 +41,9 @@ public class SettingsController{
     @FXML
     public Button scanButton;
     
+    @FXML
+    public Button artistButton;
+    
     PlayerController playerController = new PlayerController();
     
     public void songButton(ActionEvent actionEvent) throws IOException {
@@ -49,6 +52,10 @@ public class SettingsController{
     
     public void albumButton(ActionEvent actionEvent) throws IOException {
         playerController.albumButton(stage, player1, albumButton);
+    }
+
+    public void artistButton(ActionEvent actionEvent) throws IOException {
+        playerController.artistButton(stage, player1, artistButton);
     }
     
     public void browseButton(ActionEvent actionEvent) {

@@ -13,12 +13,12 @@
 
 .button:hover {
     -fx-background-color: #D3D3D3;
-    -fx-border-width: 5px;
-    -fx-border-radius:3px;
+    -fx-background-radius: 30 30 30 30;
 }
 
 .button:pressed {
     -fx-background-color: #43cea2;
+    -fx-background-radius: 30 30 30 30;
     -fx-scale-x: 0.9;
     -fx-scale-y: 0.9;
 }
@@ -81,56 +81,49 @@
 .browse-folder-button{
     -fx-graphic: url(Icons/Browse.png);
     -fx-content-display: left;
-    -fx-background-color: rgba(0,0,0,0);
-    -fx-border-color: #000000;
-    -fx-border-width: 5px;
-    -fx-border-radius: 5px;
+    -fx-background-color:#eaeaea;
+    -fx-background-radius: 30 30 30 30;
+  
 }
 
 .rescan-button {
     -fx-graphic: url(Icons/Rescan.png);
     -fx-content-display: left;
-    -fx-background-color: rgba(0,0,0,0);
-    -fx-border-color: #000000;
-    -fx-border-width: 5px;
-    -fx-border-radius: 5px;
+    -fx-background-color:#eaeaea;
+    -fx-background-radius: 30 30 30 30;
+    
 }
 
 .setting-button-clicked{
     -fx-graphic: url(Icons/Settings.png);
     -fx-content-display: left;
     -fx-background-color: #43cea2;
+    -fx-background-radius: 30 30 30 30;
 }
 
 .songs-button-clicked{
     -fx-graphic: url(Icons/Song.png);
     -fx-content-display: left;
     -fx-background-color: #43cea2;
+    -fx-background-radius: 30 30 30 30;
 }
 
 .album-button-clicked{
     -fx-graphic: url(Icons/Album.png);
     -fx-content-display: left;
     -fx-background-color: #43cea2;
+    -fx-background-radius: 30 30 30 30;
 }
 
 .artist-button-clicked{
     -fx-graphic: url(Icons/Artist.png);
     -fx-content-display: left;
     -fx-background-color: #43cea2;
+    -fx-background-radius: 30 30 30 30;
 }
 
 .album-art{
     -fx-background-color: #D3D3D3;
-}
-
-.create-playlist-button{
-    -fx-graphic: url(Icons/Create.png);
-    -fx-content-display: left;
-    -fx-background-color: rgba(0,0,0,0);
-    -fx-border-color: #000000;
-    -fx-border-width: 5px;
-    -fx-border-radius: 5px;
 }
 
 .table-view{

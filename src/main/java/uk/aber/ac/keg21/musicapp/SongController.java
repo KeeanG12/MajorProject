@@ -1,43 +1,25 @@
 package uk.aber.ac.keg21.musicapp;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.TagException;
-import org.jaudiotagger.tag.images.Artwork;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.sql.*;
 import java.util.ResourceBundle;
 
-public class MainController implements Initializable {
+public class SongController implements Initializable {
 
     private Stage stage;
 
@@ -88,7 +70,6 @@ public class MainController implements Initializable {
     
     @FXML
     public Button artistButton;
-
 
     @FXML
     public Button settingsButton;
@@ -154,8 +135,47 @@ public class MainController implements Initializable {
         colProduced.setCellValueFactory(
                 new PropertyValueFactory<SongDataModel, Integer>("produced")
         );
-        
-        playerController.initializeSongs(tableView, searchField);
+
+        music.fillTable(tableView);
+
+        //Creating a Filtered List with the SongDataModel
+        FilteredList<SongDataModel> filteredList = new FilteredList<>(music.songList, b -> true);
+
+        //Adding listener to text field to check for user input
+        searchField.textProperty().addListener((observable, oldVal, newVal) -> {
+            //If text is entered set the FilteredList Predicate
+            filteredList.setPredicate(songDataModel -> {
+
+                //If there is no changes then display all cells
+                if (newVal == null || newVal.isBlank() || newVal.isEmpty()) {
+                    return true;
+                }
+
+                //Ensuring text user has input is all lower case
+                String userInput = newVal.toLowerCase();
+
+                //Checking if any of the Songs in the list match the predicate
+                if (songDataModel.getName().toLowerCase().contains(userInput)) {
+                    return true;
+
+                } else if (songDataModel.getArtistName().toLowerCase().contains(userInput)) {
+                    return true;
+
+                } else if (songDataModel.getAlbumName().toLowerCase().contains(userInput)) {
+                    return true;
+
+                } else if (String.valueOf(songDataModel.getSongID()).contains(userInput)) {
+                    return true;
+
+                } else {
+                    return false;
+                }
+            });
+        });
+
+        //Setting displayed items as the sorted list
+        music.currentList = filteredList;
+        tableView.setItems(music.currentList);
 
         //Setting the on action event handler for the Play/Pause Button
         playButton.setOnAction(e -> {
@@ -182,8 +202,6 @@ public class MainController implements Initializable {
 
         });
 
-        player1.setOnEndOfMedia(new MediaHandler());
-
     }
 
 
@@ -199,17 +217,11 @@ public class MainController implements Initializable {
         //Uses JavaFX-Media to play a MP3 file when button is clicked
         String path = selected.getFilepath();
 
-//        if (getAlbumArt(path) != null) {
-//            albumArt.setImage((Image) getAlbumArt(path));
-//        } else {
-//            Image album = new Image("D:\\UniWork\\Third Year\\Major Project\\MajorProject\\src\\main\\resources\\uk\\aber\\ac\\keg21\\musicapp\\Icons\\AlbumCover.png");
-//            albumArt.setImage(album);
-//        }
-
         currentFile = path;
         Media sound = new Media(new File(path).toURI().toString());
         player1 = new MediaPlayer(sound);
 
+        //Checking if the start of the song
         if (time == new Duration(0.0)) {
             player1.play();
             isPaused = false;
@@ -217,15 +229,15 @@ public class MainController implements Initializable {
             player1.setStartTime(new Duration(0.0));
             player1.play();
             isPaused = false;
+        //If not start of song, play song from time it was paused    
         } else if (isPaused && time != new Duration(0.0)) {
             player1.setStartTime(time);
             player1.play();
             isPaused = false;
         }
 
-        playerController.changeVolume(volumeSlider, player1, volume);
+        playerController.changeVolume(volumeSlider, player1);
         playerController.songDuration(selected.getDuration(), player1, timeSlider, totalDuration);
-        player1.setOnEndOfMedia(new MediaHandler());
 
 
         isPlaying = true;
@@ -237,21 +249,23 @@ public class MainController implements Initializable {
 
         @Override
         public void run() {
-            player1.stop();
-            
+
+            System.out.println("2nd on end");
             //Getting the index of current file and selecting that
-            int index = playerController.findIndex(currentFile);
-            selectionModel.select(index);
+            
 
             Media nextSong = new Media(new File(playerController.findNext(currentFile, currentSong)).toURI().toString());
 
+            int index = playerController.findIndex(playerController.findNext(currentFile, currentSong));
+            selectionModel.select(index);
+
             player1 = new MediaPlayer(nextSong);
 
-            playerController.changeVolume(volumeSlider, player1, volume);
+            playerController.changeVolume(volumeSlider, player1);
             playerController.songDuration(getSelected().getDuration(), player1, timeSlider, totalDuration);
 
-            player1.play();
             player1.setOnEndOfMedia(this);
+            player1.play();
         }
     }
 
@@ -270,9 +284,7 @@ public class MainController implements Initializable {
     @FXML
     public void pauseButton() throws URISyntaxException {
         //Set the time to the song time when it was paused
-
         time = player1.getCurrentTime();
-        System.out.println(time);
         //Pause player and set playing to false
         player1.pause();
         isPlaying = false;
@@ -281,7 +293,8 @@ public class MainController implements Initializable {
 
     public void shuffleButton() {
         if (!isPlaying) {
-            music.shuffleTable(tableView);
+            FXCollections.shuffle(music.songList);
+            tableView.setItems(music.songList);
         }
 
     }
@@ -319,7 +332,7 @@ public class MainController implements Initializable {
         int index = playerController.findIndex(currentFile);
         selectionModel.select(index);
 
-        playerController.changeVolume(volumeSlider, player1, volume);
+        playerController.changeVolume(volumeSlider, player1);
         playerController.songDuration(getSelected().getDuration(), player1, timeSlider, totalDuration);
 
 

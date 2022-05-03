@@ -28,8 +28,17 @@ public class Database {
     String SONG = "Create table if not exists songs(songID integer primary key NOT NULL, name string NOT NULL, albumID Integer,artistID INTEGER, duration string, filepath string, Foreign key (albumID) references album (albumID), FOREIGN KEY (artistID) references artist (artistID))";
 
     String dropSongs = "DROP TABLE songs";
-    
+
+
+    //Referencing Static Single Instance of Database
     private static Database music = null;
+
+    //Used to getInstance of Database class as it is a singleton
+    public static Database getInstance() {
+        if (music == null)
+            music = new Database();
+        return music;
+    }
 
     private Database() {
 
@@ -56,39 +65,28 @@ public class Database {
             statement.executeUpdate(ALBUM);
             statement.executeUpdate(SONG);
 
-        } catch ( SQLException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-    
-    
-
-    public void insertArtist(String artistName) {
-        String artist = "INSERT INTO artist(name) VALUES(?)";
-        String sql = "DELETE FROM artist";
-        
-        try (Connection conn = this.connect();
-             //Uses prepared statement to pass input parameters
-             PreparedStatement statement = conn.prepareStatement(artist)) {
-            Statement statement1 = conn.createStatement();
-            
-            
-            
-            statement.setString(1, artistName);
-            statement.executeUpdate();
-            ResultSet rs = statement1.executeQuery("select * from artist");
-//            while (rs.next()) {
-//                // read the result set for debugging
-//                System.out.println("ArtistID = " + rs.getInt("artistID"));
-//                System.out.println("Name = " + rs.getString("name"));
-//            }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
     }
 
 
-    public void insertAlbum (int artistID, String albumName, int produced) {
+    public void insertArtist(String artistName) {
+        String artist = "INSERT INTO artist(name) VALUES(?)";
+        String sql = "DELETE FROM artist";
+
+        try (Connection conn = this.connect();
+             //Uses prepared statement to pass input parameters
+             PreparedStatement statement = conn.prepareStatement(artist)) {
+            statement.setString(1, artistName);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+
+    public void insertAlbum(int artistID, String albumName, int produced) {
 
         String album = "INSERT INTO album(name, produced, artistID) VALUES(?,?,?)";
         String sql = "DELETE FROM album";
@@ -97,71 +95,49 @@ public class Database {
              //Uses prepared statement to pass input parameters
              PreparedStatement statement = conn.prepareStatement(album)) {
             Statement statement1 = conn.createStatement();
-            
+
             statement.setString(1, albumName);
             statement.setInt(2, produced);
             statement.setInt(3, artistID);
             statement.executeUpdate();
-            ResultSet rs = statement1.executeQuery("select * from album");
-//            while (rs.next()) {
-//                // read the result set for debugging
-//                System.out.println("AlbumID = " + rs.getInt("albumID"));
-//                System.out.println("Name = " + rs.getString("name"));
-//                System.out.println("Produced = " + rs.getInt("produced"));
-//                System.out.println("ArtistID = " + rs.getInt("artistID"));
-//            }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
     }
 
     public void insertSong(int albumID, String songName, int artistID, String duration, String filepath) {
-
+        //Creating statement to allow for inserting data using arguments
         String song = "INSERT INTO songs(name, albumID, artistID, duration, filepath) VALUES(?,?,?,?,?)";
-        String sql = "DELETE FROM songs";
 
+        //Connecting to Database using Connect method
         try (Connection conn = this.connect();
              //Uses prepared statement to pass input parameters
              PreparedStatement statement = conn.prepareStatement(song)) {
-            Statement statement1 = conn.createStatement();
-            
+            //Inserting Data into table using Input Parameters of Method
             statement.setString(1, songName);
             statement.setInt(2, albumID);
             statement.setInt(3, artistID);
             statement.setString(4, duration);
             statement.setString(5, filepath);
             statement.executeUpdate();
-            ResultSet rs = statement1.executeQuery("select * from songs");
-//            while (rs.next()) {
-//                // read the result set for debugging
-//                System.out.println("SongID = " + rs.getInt("songID"));
-//                System.out.println("Name = " + rs.getString("name"));
-//                System.out.println("AlbumID = " + rs.getInt("albumID"));
-//                System.out.println("ArtistID = " + rs.getInt("artistID"));
-//                System.out.println("Duration = " + rs.getString("duration"));
-//                System.out.println("File Path = " + rs.getString("filepath"));
-//            }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        
-        
-
     }
-    
+
     public void delete() {
         String sql = "DELETE FROM songs";
         String sql2 = "DELETE FROM artist";
         String sql3 = "DELETE FROM album";
 
         try (Connection conn = this.connect()) {
-             //Uses prepared statement to pass input parameters
+            //Uses prepared statement to pass input parameters
             Statement statement1 = conn.createStatement();
-            
+
             statement1.executeUpdate(sql);
             statement1.executeUpdate(sql2);
             statement1.executeUpdate(sql3);
-            
+
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -169,13 +145,14 @@ public class Database {
 
     public ObservableList<SongDataModel> songList;
 
+    //List for any filtered results
     public ObservableList<SongDataModel> currentList;
 
     public SongDataModel song = new SongDataModel();
-    
+
     public void fillTable(TableView tableView) {
         songList = FXCollections.observableArrayList();
-        
+
         //Using SQLite Inner Join to Select 3 tables using albumID
         String selectAll = "SELECT " +
                 "songID," +
@@ -189,18 +166,16 @@ public class Database {
                 "INNER JOIN album ON album.albumID = songs.albumID " +
                 "INNER JOIN artist ON artist.artistID = album.artistID";
 
-        try(Connection conn = this.connect();
+        try (Connection conn = this.connect();
 
-            Statement statement = conn.createStatement()) {
+             Statement statement = conn.createStatement()) {
             ResultSet rs = statement.executeQuery(selectAll);
             //Adding new song to list while ResultSet has next
             while (rs.next()) {
                 SongDataModel s = new SongDataModel();
                 s.setSongID(rs.getInt("songID"));
                 s.setName(rs.getString("songName"));
-//                s.setArtistID(rs.getInt("artistID"));
                 s.setArtistName(rs.getString("artistName"));
-//                s.setAlbumID(rs.getInt("albumID"));
                 s.setAlbumName(rs.getString("albumName"));
                 s.setDuration(rs.getString("duration"));
                 s.setProduced(rs.getInt("produced"));
@@ -215,20 +190,15 @@ public class Database {
             e.printStackTrace();
         }
     }
-    
-    public void shuffleTable(TableView tableView) {
-        FXCollections.shuffle(songList);
-        tableView.setItems(songList);
-    }
-    
+
     private boolean checkExists(String name, String table, String idType) {
-        String sql = "SELECT '"+idType+"', name FROM '"+table+"' WHERE name = '"+name+"'";
-        
+        String sql = "SELECT '" + idType + "', name FROM '" + table + "' WHERE name = '" + name + "'";
+
         boolean exists = false;
-        
-        try(Connection conn = this.connect();
-            Statement statement = conn.createStatement();
-            ResultSet resultSet = statement.executeQuery(sql)) {
+
+        try (Connection conn = this.connect();
+             Statement statement = conn.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()) {
                 exists = true;
             }
@@ -237,28 +207,27 @@ public class Database {
         }
         return exists;
     }
-    
-    
-    
+
+
     private int getID(String name, String table, String idType) {
         int id = 0;
         //Select statement to find the ID of on album, artist or song based on arguments
-        String sql = "SELECT * from '"+table+"' WHERE name = '"+name+"'";
+        String sql = "SELECT * from '" + table + "' WHERE name = '" + name + "'";
 
-        try(Connection conn = this.connect();
-            Statement statement = conn.createStatement();
-            ResultSet resultSet = statement.executeQuery(sql)) {
+        try (Connection conn = this.connect();
+             Statement statement = conn.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
             //Set return ID as ID in result set
             while (resultSet.next()) {
-                id = resultSet.getInt( idType);
+                id = resultSet.getInt(idType);
             }
-            
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return id;
     }
-    
+
 
     //Variables for Number of files, Number of directories and track number
     private int numFiles;
@@ -266,6 +235,7 @@ public class Database {
 
     /**
      * Scans file recursivley and populates SQLite DB with each files tag data
+     *
      * @param file
      * @throws CannotReadException
      * @throws TagException
@@ -274,79 +244,74 @@ public class Database {
      * @throws IOException
      */
     public void rescan(File file) throws IOException {
-        
-            //Checks if the file is a directory or a file
-            if (file.isFile()) {
-                //Initialising variables in order to get tag data
-                AudioFile audioFile = null;
-                MP3File f = null;
-                //Setting the MP3 file to AudioFile.read of the current file being parsed in
-                try {
-                    f = (MP3File) AudioFileIO.read(new File(file.getAbsolutePath()));
-                } catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
-                    e.printStackTrace();
-                }
-                scanMetadataTags(f, file);
-                //Adding one to the number of files scanned
-                numFiles++;
-                
-                } else {
-                numDirectories++;
-                //List the files in the directory
-                File[] files = file.listFiles();
-                
-                //For each file call rescan on that file
-                for (File nextFile : files) {
-                    rescan(nextFile);
-                }
+
+        //Checks if the file is a directory or a file
+        if (file.isFile()) {
+            //Initialising variables in order to get tag data
+            AudioFile audioFile = null;
+            MP3File f = null;
+            //Setting the MP3 file to AudioFile.read of the current file being parsed in
+            try {
+                f = (MP3File) AudioFileIO.read(new File(file.getAbsolutePath()));
+            } catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
+                e.printStackTrace();
+            }
+            scanMetadataTags(f, file);
+            //Adding one to the number of files scanned
+            numFiles++;
+
+        } else {
+            numDirectories++;
+            //List the files in the directory
+            File[] files = file.listFiles();
+
+            //For each file call rescan on that file
+            for (File nextFile : files) {
+                rescan(nextFile);
             }
         }
-        
-        public void scanMetadataTags(MP3File f, File file) {
-            //Creating a tag variable to get the tag data of the MP3 AudioFile
-            Tag tag = f.getTag();
-            MP3AudioHeader audioHeader = f.getMP3AudioHeader();
-            AbstractID3v2Tag v2tag  = f.getID3v2Tag();
+    }
+
+    public void scanMetadataTags(MP3File mp3File, File file) {
+
+        //Creating a tag variable to get the tag data of the MP3 AudioFile
+        Tag tag = mp3File.getTag();
+        MP3AudioHeader audioHeader = mp3File.getMP3AudioHeader();
+        AbstractID3v2Tag v2tag = mp3File.getID3v2Tag();
+
+        String artist = v2tag.getFirst(ID3v24Frames.FRAME_ID_ARTIST);
+        String album = v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM);
+        String song = v2tag.getFirst(ID3v24Frames.FRAME_ID_TITLE);
 
 
-            //Retrieving everything before " Feat." in the artist name using .split
-            String artistTag = v2tag.getFirst(ID3v24Frames.FRAME_ID_ARTIST);
-            String parts[] = artistTag.split(" Feat. ");
+        //Retrieving everything before " Feat." in the artist name using .split
+        String parts[] = artist.split(" Feat. ");
 
-            //Declaring current artist, album and song
-            String artist = parts[0];
-            String album = v2tag.getFirst(ID3v24Frames.FRAME_ID_ALBUM);
-            String song = v2tag.getFirst(ID3v24Frames.FRAME_ID_TITLE);
+        //Declaring current artist, album and song
+        artist = parts[0];
 
-            int artistID = getID(artist, "artist", "artistID");
-            int albumID = getID(album, "album", "artistID");
+        album = album.replace(",", "");
+        album = album.replace("'", "");
 
+        int artistID;
+        int albumID;
 
-
-            //Checks if current artist already exists in database and gets the ID if true
-            if(checkExists(artist, "artist", "artistID")) {
-                //Adds the current artist if they don't exist in the database    
-            } else {
-                insertArtist(artist);
-            }
-            artistID = getID(artist, "artist", "artistID");
-            //Checks if current album already exists in database and gets the ID if true
-            if(checkExists(album, "album", "albumID")) {
-                //Adds current album if it doesn't exist in the database    
-            } else {
-                insertAlbum(artistID, album, Integer.parseInt(v2tag.getFirst(FieldKey.YEAR)));
-            }
-            albumID = getID(album, "album", "albumID");
-            //Adds current song
-            String filepath = file.getAbsolutePath();
-            insertSong(albumID, song, artistID, (audioHeader.getTrackLengthAsString()), filepath);
+        //Inserts artist into database if they do not already exist
+        if (!checkExists(artist, "artist", "artistID")) {
+            insertArtist(artist);
         }
-        
-        
-        //Used to getInstance of Database class as it is a singleton
-    public static Database getInstance() {
-        if (music == null)
-            music = new Database();
-        return music;
+        //getID for inserting album and song
+        artistID = getID(artist, "artist", "artistID");
+
+        //Inserts album into database if they do not already exist
+        if (!checkExists(album, "album", "albumID")) {
+            insertAlbum(artistID, album, Integer.parseInt(v2tag.getFirst(FieldKey.YEAR)));
+        }
+        //getID for inserting song
+        albumID = getID(album, "album", "albumID");
+
+        //Adds current song
+        String filepath = file.getAbsolutePath();
+        insertSong(albumID, song, artistID, (audioHeader.getTrackLengthAsString()), filepath);
     }
 }

@@ -2,6 +2,7 @@ package uk.aber.ac.keg21.musicapp;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
@@ -14,22 +15,17 @@ public class Main extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
-        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("Main.fxml"));
-        Scene scene = new Scene(fxmlLoader.load());
-        stage.setFullScreen(true);
-        stage.setTitle("KG Music Player");
-        stage.setScene(scene);
+
+        Parent root = FXMLLoader.load(Main.class.getResource("Main.fxml"));
+        stage.setScene(new Scene(root));
+        stage.setMaximized(true);
         stage.show();
     }
 
     
     public static void main(String[] args) throws IOException {
-        launch();
+        launch(args);
         Database music = Database.getInstance();
-//        music.startUp();
-//        music.rescan(new File("D:/UniWork/Third Year/Major Project/MajorProject/src/main/resources/Tunes"));
-//
-//        music.delete();
         
     }
 }

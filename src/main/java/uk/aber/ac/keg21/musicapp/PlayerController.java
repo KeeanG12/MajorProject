@@ -49,15 +49,13 @@ public class PlayerController {
     }
 
 
-    public void changeVolume(Slider volumeSlider, MediaPlayer player1, Double volume) {
+    public void changeVolume(Slider volumeSlider, MediaPlayer player1) {
         //Setting slider value to current player volume * 100 as the volume range is 0.0 - 1.0
         volumeSlider.setValue(player1.getVolume() * 100);
 
         //Setting the volume to slider value / 100 if the slider value changes
-        volumeSlider.valueProperty().addListener(observable -> player1.setVolume(volumeSlider.getValue() / 100));
-
-        volume = volumeSlider.getValue() / 100;
-
+        volumeSlider.valueProperty().addListener(observable -> 
+                player1.setVolume(volumeSlider.getValue() / 100));
     }
 
     public void songDuration(String duration, MediaPlayer player1, Slider timeSlider, Label totalDuration) {
@@ -99,7 +97,7 @@ public class PlayerController {
         Parent root = FXMLLoader.load(Main.class.getResource("Main.fxml"));
         stage = (Stage) songsButton.getScene().getWindow();
         stage.setScene(new Scene(root));
-        stage.setFullScreen(true);
+        stage.setMaximized(true);
 
     }
 
@@ -110,7 +108,7 @@ public class PlayerController {
         Parent root = FXMLLoader.load(Main.class.getResource("Setting.fxml"));
         stage = (Stage) settingsButton.getScene().getWindow();
         stage.setScene(new Scene(root));
-        stage.setFullScreen(true);
+        stage.setMaximized(true);
 
     }
 
@@ -121,7 +119,7 @@ public class PlayerController {
         Parent root = FXMLLoader.load(Main.class.getResource("Albums.fxml"));
         stage = (Stage) albumButton.getScene().getWindow();
         stage.setScene(new Scene(root));
-        stage.setFullScreen(true);
+        stage.setMaximized(true);
     }
 
     public void artistButton(Stage stage, MediaPlayer player1, Button artistButton) throws IOException {
@@ -131,7 +129,7 @@ public class PlayerController {
         Parent root = FXMLLoader.load(Main.class.getResource("Artist.fxml"));
         stage = (Stage) artistButton.getScene().getWindow();
         stage.setScene(new Scene(root));
-        stage.setFullScreen(true);
+        stage.setMaximized(true);
 
     }
 
@@ -157,8 +155,6 @@ public class PlayerController {
 
 
     public String findNext(String currentFile, Label currentSong) {
-
-
         String nextFilepath = "";
         Boolean found = false;
         SongDataModel nextSong = new SongDataModel();
@@ -235,85 +231,5 @@ public class PlayerController {
             }
         }
         return previousFilepath;
-    }
-
-    public void initializeSongs(TableView tableView, TextField searchField) {
-
-        music.fillTable(tableView);
-
-        //Creating a Filtered List with the SongDataModel
-        FilteredList<SongDataModel> filteredList = new FilteredList<>(music.songList, b -> true);
-
-        //Adding listener to text field to check for user input
-        searchField.textProperty().addListener((observable, oldVal, newVal) -> {
-            //If text is entered set the FilteredList Predicate
-            filteredList.setPredicate(songDataModel -> {
-
-                //If there is no changes then display all cells
-                if (newVal == null || newVal.isBlank() || newVal.isEmpty()) {
-                    return true;
-                }
-
-                //Ensuring text user has input is all lower case
-                String userInput = newVal.toLowerCase();
-
-                //Checking if any of the Songs in the list match the predicate
-                if (songDataModel.getName().toLowerCase().contains(userInput)) {
-                    return true;
-
-                } else if (songDataModel.getArtistName().toLowerCase().contains(userInput)) {
-                    return true;
-
-                } else if (songDataModel.getAlbumName().toLowerCase().contains(userInput)) {
-                    return true;
-
-                } else if (String.valueOf(songDataModel.getSongID()).contains(userInput)) {
-                    return true;
-
-                } else {
-                    return false;
-                }
-            });
-        });
-
-        //Setting displayed items as the sorted list
-        music.currentList = filteredList;
-        tableView.setItems(music.currentList);
-    }
-
-    public void initializeAlbums(ChoiceBox choiceBox, String previous, TableView tableView, String selected) {
-        for (int i = 0; i < music.songList.size() - 1; i++) {
-            String current = music.songList.get(i).getAlbumName();
-
-            if (choiceBox.getItems().contains(previous)) {
-//                System.out.println("Already Exists");
-            } else {
-                choiceBox.getItems().add(current);
-            }
-            previous = music.songList.get(i).getAlbumName();
-        }
-
-        music.fillTable(tableView);
-
-        selected = (String) choiceBox.getSelectionModel().getSelectedItem();
-        
-    }
-
-    public void initializeArtist(ChoiceBox choiceBox, String previous, TableView tableView, String selected) {
-        for (int i = 0; i < music.songList.size() - 1; i++) {
-            String current = music.songList.get(i).getArtistName();
-
-            if (choiceBox.getItems().contains(previous)) {
-//                System.out.println("Already Exists");
-            } else {
-                choiceBox.getItems().add(current);
-            }
-            previous = music.songList.get(i).getArtistName();
-        }
-
-        music.fillTable(tableView);
-
-        selected = (String) choiceBox.getSelectionModel().getSelectedItem();
-
     }
 }

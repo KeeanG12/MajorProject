@@ -35,15 +35,21 @@ public class AlbumController implements Initializable {
 
     @FXML
     public Button songsButton;
-    
+
     @FXML
     public Button settingsButton;
-    
+
     @FXML
     public Button playButton;
-    
+
     @FXML
     public Button pauseButton;
+
+    @FXML
+    public Button artistButton;
+
+    @FXML
+    Button shuffleButton;
 
     @FXML
     public TableView tableView;
@@ -62,27 +68,27 @@ public class AlbumController implements Initializable {
 
     @FXML
     private TableColumn colDuration;
-    
+
     @FXML
     private TableColumn colProduced;
 
     @FXML
     private MediaPlayer player1;
-    
+
     @FXML
     public Label currentSong;
-    
+
     @FXML
     public Slider volumeSlider;
-    
+
     @FXML
     public Label totalDuration;
-    
+
     @FXML
     public Slider timeSlider;
 
     public String currentFile;
-    
+
     public Duration time = new Duration(0.0);
 
     private boolean isPlaying = false;
@@ -90,7 +96,7 @@ public class AlbumController implements Initializable {
     private String previousSong = "";
 
     private double volume = 1.0;
-    
+
     TableView.TableViewSelectionModel<SongDataModel> selectionModel;
 
     String previous;
@@ -98,7 +104,7 @@ public class AlbumController implements Initializable {
     Database music = Database.getInstance();
 
     String selected;
-    
+
     PlayerController playerController = new PlayerController();
 
 
@@ -125,13 +131,26 @@ public class AlbumController implements Initializable {
         colDuration.setCellValueFactory(
                 new PropertyValueFactory<SongDataModel, Integer>("duration")
         );
-        
+
         colProduced.setCellValueFactory(
-                new  PropertyValueFactory<SongDataModel, Integer>("produced")
+                new PropertyValueFactory<SongDataModel, Integer>("produced")
         );
 
-        playerController.initializeAlbums(choiceBox, previous, tableView, selected);
-        
+        for (int i = 0; i < music.songList.size() - 1; i++) {
+            String current = music.songList.get(i).getAlbumName();
+
+            if (choiceBox.getItems().contains(previous)) {
+//                System.out.println("Already Exists");
+            } else {
+                choiceBox.getItems().add(current);
+            }
+            previous = music.songList.get(i).getAlbumName();
+        }
+
+        music.fillTable(tableView);
+
+        selected = (String) choiceBox.getSelectionModel().getSelectedItem();
+
         changeTable();
     }
 
@@ -152,7 +171,7 @@ public class AlbumController implements Initializable {
                     }
 
                     String userSelection = newVal.toLowerCase();
-                     
+
                     if (songDataModel.getAlbumName().toLowerCase().contains(userSelection)) {
                         return true;
                     }
@@ -200,7 +219,7 @@ public class AlbumController implements Initializable {
         //Finding the directory path from the selected cell data
         String artist = selected.getArtistName();
         currentSong.setText(artist + " - " + selected.getName());
-        
+
         //Uses JavaFX-Media to play a MP3 file when button is clicked
         String path = selected.getFilepath();
 
@@ -221,7 +240,7 @@ public class AlbumController implements Initializable {
             isPaused = false;
         }
 
-        playerController.changeVolume(volumeSlider, player1, volume);
+        playerController.changeVolume(volumeSlider, player1);
         playerController.songDuration(selected.getDuration(), player1, timeSlider, totalDuration);
 //        player1.setOnEndOfMedia(new MainController.MediaHandler());
 
@@ -286,11 +305,20 @@ public class AlbumController implements Initializable {
         int index = playerController.findIndex(currentFile);
         selectionModel.select(index);
 
-        playerController.changeVolume(volumeSlider, player1, volume);
+        playerController.changeVolume(volumeSlider, player1);
         playerController.songDuration(getSelected().getDuration(), player1, timeSlider, totalDuration);
 
 
         player1.play();
+    }
+
+    @FXML
+    public void shuffleButton() {
+        if (!isPlaying) {
+            FXCollections.shuffle(music.currentList);
+            tableView.setItems(music.currentList);
+        }
+
     }
 
 
@@ -298,8 +326,12 @@ public class AlbumController implements Initializable {
         playerController.songButton(stage, player1, songsButton);
 
     }
-    
+
     public void settingsButton(ActionEvent actionEvent) throws IOException {
         playerController.settingButton(stage, player1, settingsButton);
+    }
+
+    public void artistButton(ActionEvent actionEvent) throws IOException {
+        playerController.artistButton(stage, player1, artistButton);
     }
 }
